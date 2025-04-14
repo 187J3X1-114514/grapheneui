@@ -166,7 +166,10 @@ if __name__ == "__main__":
     
     start_time = time.time()
     print(f"\n开始构建 {len(version_configs)} 个版本:")
-    
+
+    if not call_gradle_task("native:buildNative"):
+        print(f"依赖库编译失败，退出程序")
+        sys.exit(1)
     for version, config in version_configs.items():
         print(f"\n=== 正在构建 {version} ===")
         print("目标加载器:", ", ".join(config["common"]["platforms"]))
