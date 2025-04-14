@@ -144,3 +144,4 @@ build_jars
 /common/bin
 
 .vscode
+/native/cpp/bin/
