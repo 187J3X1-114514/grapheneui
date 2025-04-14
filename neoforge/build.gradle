@@ -1,0 +1,110 @@
+import java.nio.file.Paths
+
+plugins {
+    id 'com.github.johnrengelman.shadow'
+}
+
+loom {
+    neoForge {
+    }
+
+    runs {
+        client {
+            client()
+            //vmArgs.add("-XX:+CreateCoredumpOnCrash")
+            runDir("../run")
+        }
+        server {
+            server()
+            runDir("../run")
+        }
+    }
+
+}
+
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+configurations {
+    common
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentNeoForge.extendsFrom common
+}
+
+repositories {
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+    maven {
+        name = 'NeoForged'
+        url = 'https://maven.neoforged.net/releases'
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+
+
+dependencies {
+    neoForge "net.neoforged:neoforge:${versionConfig.neoforge.loaderVersion}"
+    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive false }
+    for (lib in versionConfig.neoforge.dependencies.modrinth) {
+        modImplementation("maven.modrinth:${lib.name}:${lib.version}-neoforge,${rootProject.minecraft_version}")
+    }
+    for (lib in versionConfig.neoforge.dependencies.local) {
+        def file = Paths.get(rootProject.projectDir.asWritable().absolutePath, "libs", lib.name + ".jar")
+        if (lib.isMod) {
+            modImplementation(
+                    files(file.toAbsolutePath().asWritable().toString())
+            )
+        } else {
+            implementation(
+                    forgeRuntimeLibrary(
+                            files(file.toAbsolutePath().asWritable().toString())
+                    )
+            )
+        }
+    }
+    modImplementation("me.shedaniel.cloth:cloth-config-neoforge:$versionConfig.common.clothConfigVersion")
+    modImplementation "dev.architectury:architectury-neoforge:$versionConfig.common.architecturyApiVersion"
+    modCompileOnly "dev.architectury:architectury:$versionConfig.common.architecturyApiVersion"
+    include(implementation(forgeRuntimeLibrary("org.lwjgl:lwjgl-nanovg:$versionConfig.common.lwjglVersion")))
+    for (var natives : lwjglNatives) {
+        forgeRuntimeLibrary("org.lwjgl:lwjgl-nanovg::$natives")
+    }
+}
+
+processResources {
+    inputs.property 'version', project.version
+
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand(
+                version: project.version,
+                versionRange: versionConfig.common.neoforgeVersionRange
+        )
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier = "dev-shadow"
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+}

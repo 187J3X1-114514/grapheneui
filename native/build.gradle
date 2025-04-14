@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+}
+
+group = 'io.homo.grapheneui.cpp'
+version = '0.0.1-alpha.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}
+
+tasks.register('configureCMake', Exec) {
+    workingDir file(projectDir.path + "/cpp")
+    commandLine 'cmake', '-S', '.', '-B', 'build', '-G', 'MinGW Makefiles'
+
+    doFirst {
+        delete "${projectDir}/cpp/build"
+        delete "${projectDir}/cpp/bin"
+        mkdir "${projectDir}/cpp/build"
+    }
+}
+
+tasks.register('buildCMake', Exec) {
+    dependsOn configureCMake
+    workingDir file(projectDir.path + "/cpp/build")
+    commandLine 'cmake', '--build', '.'
+}
+
+tasks.register('buildNative') {
+    dependsOn configureCMake
+    dependsOn buildCMake
+    finalizedBy copyNativeLib
+
+    doLast {
+        println "构建完成"
+    }
+}
+
+tasks.register('copyNativeLib', Copy) {
+    dependsOn buildCMake
+    from "${projectDir}/cpp/bin/"
+    into "${projectDir}/../common/src/main/resources/libs/"
+
+    doFirst {
+        if (!file("${projectDir}/cpp/bin/libGrapheneUILib.dll").exists()) {
+            throw new GradleException("未发现库文件")
+        }
+    }
+}

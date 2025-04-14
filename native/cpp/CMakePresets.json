@@ -1,0 +1,17 @@
+{
+    "version": 8,
+    "configurePresets": [
+        {
+            "name": "main",
+            "displayName": "GCC 13.1.0 x86_64-w64-mingw32",
+            "description": "正在使用编译器: C = C:\\Strawberry\\c\\bin\\gcc.exe, CXX = C:\\Strawberry\\c\\bin\\g++.exe",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_C_COMPILER": "C:/Strawberry/c/bin/gcc.exe",
+                "CMAKE_CXX_COMPILER": "C:/Strawberry/c/bin/g++.exe",
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+architectury {
+    common(versionConfig.common.platforms)
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:$versionConfig.fabric.loaderVersion"
+    modCompileOnly "dev.architectury:architectury:$versionConfig.common.architecturyApiVersion"
+    modCompileOnly("me.shedaniel.cloth:cloth-config:$versionConfig.common.clothConfigVersion")
+    implementation "org.anarres:jcpp:1.4.14"
+    implementation("org.lwjgl:lwjgl-nanovg:$versionConfig.common.lwjglVersion")
+}

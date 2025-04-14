@@ -1,0 +1,50 @@
+import groovy.json.JsonSlurper
+
+pluginManagement {
+    repositories {
+        mavenLocal()
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven {
+            name 'ParchmentMC'
+            url 'https://ldtteam.jfrog.io/artifactory/parchmentmc/'
+        }
+
+        maven {
+            url "https://maven.architectury.dev/"
+        }
+        maven {
+            url "https://maven.nucleoid.xyz/"
+        }
+        maven { url "https://maven.shedaniel.me/" }
+        maven {
+            url "https://maven.neoforged.net/releases"
+        }
+        maven {
+            url "https://libraries.minecraft.net"
+        }
+        maven {
+            url "https://maven.fabricmc.net/"
+        }
+
+        maven { url "https://crystal.app.lss233.com/repositories/minecraft/" }
+        gradlePluginPortal()
+    }
+}
+
+def loadConfig() {
+    gradle.ext.set("versionConfigSrc", new JsonSlurper().parse(new File("$rootDir/versionConfigs/" + "$minecraft_version" + ".json")))
+}
+
+loadConfig()
+rootProject.name = 'graphene-modlib'
+
+include 'common'
+for (loader in gradle.ext.versionConfigSrc.common.platforms) {
+    def loaderName = loader.strip()
+    if (loaderName.isEmpty() || loaderName.isBlank()) continue
+    println "添加加载器 " + loaderName
+    include(loaderName)
+}
+include 'native'
+

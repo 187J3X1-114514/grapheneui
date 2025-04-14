@@ -1,0 +1,143 @@
+import superresolution.VersionConfig
+
+plugins {
+    id "dev.architectury.loom" version "1.10-SNAPSHOT" apply false
+    id "architectury-plugin" version "3.4-SNAPSHOT"
+    id "systems.manifold.manifold-gradle-plugin" version "0.0.2-alpha"
+    id "com.github.johnrengelman.shadow" version "8.1.1" apply false
+    id "io.github.pacifistmc.forgix" version "1.2.9"
+}
+
+ext {
+    versionConfig = VersionConfig.loadFromFile(new File("$rootDir/versionConfigs/${minecraft_version}.json"))
+}
+
+static int toVerCode(String verStr) {
+    int a = Integer.parseInt(verStr.split("\\.")[0])
+    int b = Integer.parseInt(verStr.split("\\.")[1])
+    int c = Integer.parseInt(verStr.split("\\.")[2])
+    return (a * 10000000) + (b * 1000) + (c * 1)
+}
+
+def writeDefine() {
+    StringBuilder sb = new StringBuilder()
+    var curVers = new ArrayList<>();
+    new File(rootProject.projectDir, "versionConfigs").eachFile { file ->
+        if (file.name.endsWith(".json")) {
+            def ver = file.name.replace(".json", "")
+            curVers.add(ver)
+            def verCode = toVerCode(ver)
+            sb.append("MC_" + ver.replace(".", "_") + "=" + toVerCode(ver) + "\n")
+            println("%s -> %s".formatted(ver, verCode))
+        }
+    }
+    var vers = new String[]{
+            "1.20.1", "1.20.4", "1.21.1", "1.21.4", "1.21.5",
+    }
+    for (var ver : vers) {
+        if (!curVers.contains(ver)) {
+            sb.append("MC_" + ver.replace(".", "_") + "=" + toVerCode(ver) + "\n")
+        }
+    }
+    sb.append("MC_VER=" + toVerCode(versionConfig.common.minecraftVersion) + "\n")
+    println("MC_VER=%s -> %s".formatted(versionConfig.common.minecraftVersion, toVerCode(versionConfig.common.minecraftVersion)))
+    new File(projectDir.asWritable().absolutePath, "build.properties").text = sb.toString()
+}
+
+project.ext.lwjglNatives = new String[]{
+        "natives-windows",
+}
+
+writeDefine()
+
+architectury {
+    minecraft = versionConfig.common.minecraftVersion
+}
+
+
+allprojects {
+    apply plugin: "systems.manifold.manifold-gradle-plugin"
+    group = rootProject.maven_group
+    version = rootProject.mod_version
+    tasks.withType(JavaCompile) {
+        options.release = versionConfig.common.javaVersion as Integer
+        options.compilerArgs += ["-Xplugin:Manifold"]
+        options.encoding = "UTF-8"
+    }
+}
+
+subprojects {
+    apply plugin: "dev.architectury.loom"
+    apply plugin: "architectury-plugin"
+    apply plugin: "systems.manifold.manifold-gradle-plugin"
+    apply plugin: "maven-publish"
+
+    manifold {
+        manifoldVersion = rootProject.manifold_version
+    }
+
+    base {
+        archivesName = "$rootProject.archives_name-$project.name-$versionConfig.common.minecraftVersion"
+    }
+
+    repositories {
+
+        maven {
+            name 'ParchmentMC'
+            url 'https://maven.parchmentmc.org/'
+        }
+        maven {
+            url "https://maven.neoforged.net/releases"
+        }
+
+    }
+
+    dependencies {
+        minecraft "net.minecraft:minecraft:$versionConfig.common.minecraftVersion"
+        mappings loom.layered() {
+            officialMojangMappings()
+            if (versionConfig.common.parchmentVersion != null) {
+                parchment("org.parchmentmc.data:parchment-${versionConfig.common.parchmentVersion}@zip")
+            }
+        }
+        annotationProcessor("systems.manifold:manifold-preprocessor:${rootProject.manifold_version}")
+        configurations.configureEach {
+            resolutionStrategy {
+                force "org.lwjgl:lwjgl:$versionConfig.common.lwjglVersion"
+                force "org.lwjgl:lwjgl-glfw:$versionConfig.common.lwjglVersion"
+                force "org.lwjgl:lwjgl-opengl:$versionConfig.common.lwjglVersion"
+                force "org.lwjgl:lwjgl-openal:$versionConfig.common.lwjglVersion"
+                force "org.lwjgl:lwjgl-stb:$versionConfig.common.lwjglVersion"
+                force "org.lwjgl:lwjgl-jemalloc:$versionConfig.common.lwjglVersion"
+                force "org.lwjgl:lwjgl-tinyfd:$versionConfig.common.lwjglVersion"
+                force "org.lwjgl:lwjgl-freetype:$versionConfig.common.lwjglVersion"
+            }
+        }
+        implementation "org.lwjgl:lwjgl-glfw:$versionConfig.common.lwjglVersion"
+    }
+
+
+    java {
+        withSourcesJar()
+
+        sourceCompatibility = JavaVersion.toVersion(versionConfig.common.javaVersion)
+        targetCompatibility = JavaVersion.toVersion(versionConfig.common.javaVersion)
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = versionConfig.common.javaVersion
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId = base.archivesName.get()
+                from components.java
+            }
+        }
+
+        repositories {
+
+        }
+    }
+}

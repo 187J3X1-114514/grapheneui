@@ -1,0 +1,1 @@
+#define CLASS_PATH "io/homo/grapheneui/nanovg/NanoVGNative"

@@ -1,0 +1,142 @@
+import java.nio.file.Paths
+
+plugins {
+    id 'com.github.johnrengelman.shadow'
+}
+loom {
+    runs {
+        client {
+            client()
+            runDir("../run")
+        }
+        server {
+            server()
+            runDir("../run")
+        }
+    }
+}
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+configurations {
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+
+    // Files in this configuration will be bundled into your mod using the Shadow plugin.
+    // Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
+    shadowBundle {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+
+}
+
+repositories {
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/"
+    }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
+    maven {
+        url "https://maven.nucleoid.xyz/"
+    }
+}
+
+def addModrinthMod(id, ver) {
+    dependencies { modImplementation("maven.modrinth:${id}:${ver}-fabric,${rootProject.minecraft_version}") }
+}
+
+def addNoModLib(name_) {
+    def file = Paths.get(rootProject.projectDir.asWritable().absolutePath, "libs", name_ + ".jar")
+    dependencies {
+        implementation(files(file.toAbsolutePath().asWritable().toString()))
+    }
+}
+
+def addModLib(name_) {
+    def file = Paths.get(rootProject.projectDir.asWritable().absolutePath, "libs", name_ + ".jar")
+
+    dependencies {
+        modImplementation(files(file.toAbsolutePath().asWritable().toString()))
+    }
+}
+
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:$versionConfig.fabric.loaderVersion"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$versionConfig.fabric.apiVersion"
+    modImplementation "dev.architectury:architectury-fabric:$versionConfig.common.architecturyApiVersion"
+    modImplementation("com.terraformersmc:modmenu:$versionConfig.fabric.modmenuVersion")
+    modImplementation("me.shedaniel.cloth:cloth-config-fabric:$versionConfig.common.clothConfigVersion")
+    for (lib in versionConfig.fabric.dependencies.modrinth) {
+        addModrinthMod(lib.name, lib.version)
+    }
+    for (lib in versionConfig.fabric.dependencies.local) {
+        if (lib.isMod) {
+            addModLib(lib.name)
+        } else {
+            addNoModLib(lib.name)
+        }
+    }
+
+    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
+    implementation "org.anarres:jcpp:1.4.14"
+    implementation "org.antlr:antlr4-runtime:4.13.1"
+    implementation "io.github.douira:glsl-transformer:2.0.1"
+    implementation("org.lwjgl:lwjgl-nanovg:$versionConfig.common.lwjglVersion")
+    implementation("org.lwjgl:lwjgl-nanovg:$versionConfig.common.lwjglVersion")
+    for (var natives : lwjglNatives) {
+        include(runtimeOnly("org.lwjgl:lwjgl-nanovg::$natives"))
+    }
+    include("org.lwjgl:lwjgl-nanovg:$versionConfig.common.lwjglVersion")
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand(
+                version: project.version,
+                javaVersion: versionConfig.common.javaVersion
+        )
+        filter { String line ->
+            return line.replace('"{versionRange}"', versionConfig.common.fabricVersionRange.size() == 1 ?
+                    '"' + versionConfig.common.fabricVersionRange.get(0) + '"' :
+                    '[' + versionConfig.common.fabricVersionRange.stream().map {
+                        return '"' + it + '"'
+                    }.toList().join(",") + ']'
+            )
+        }
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowBundle]
+    archiveClassifier = 'dev-shadow'
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+}
+loom {
+}

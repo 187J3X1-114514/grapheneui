@@ -1,0 +1,34 @@
+modLoader = "javafml"
+loaderVersion = "*"
+issueTrackerURL = ""
+license = "MIT"
+
+[[mods]]
+modId = "grapheneui"
+version = "${version}"
+displayName = "Graphene UI"
+authors = "187J3X1"
+description = '''
+喵
+'''
+logoFile = "assets/grapheneui/logo.png"
+
+[[dependencies.grapheneui]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${versionRange}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.grapheneui]]
+modId = "architectury"
+mandatory = true
+versionRange = "[*,)"
+ordering = "NONE"
+side = "BOTH"
+
+[mods."sodium:options"]
+"mixin.features.render.gui.debug" = false
+
+[[mixins]]
+config = "grapheneui.mixins.json"
