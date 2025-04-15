@@ -1,12 +1,12 @@
 package io.homo.grapheneui.gui.widgets.buttons;
 
+import io.homo.grapheneui.GrapheneUI;
 import io.homo.grapheneui.animator.Easing;
 import io.homo.grapheneui.animator.NumberAnimator;
 import io.homo.grapheneui.core.Transform;
 import io.homo.grapheneui.impl.Rectangle;
 import io.homo.grapheneui.impl.Vec2;
 import io.homo.grapheneui.nanovg.NanoVG;
-import io.homo.grapheneui.nanovg.NanoVGFontLoader;
 import io.homo.grapheneui.nanovg.renderer.TextAlign;
 import io.homo.grapheneui.utils.Color;
 
@@ -70,8 +70,8 @@ public class PressButton<T> extends AbstractButton<T> {
             nvg.save();
             nvg.transform(null);
             NanoVG.RENDERER.TEXT.drawAlignedText(
-                    NanoVGFontLoader.FONT.name,
-                    17f,
+                    GrapheneUI.regularFont(),
+                    14f,
                     txt,
                     rectangle.x + rectangle.width * 0.5f,
                     rectangle.y + rectangle.height * 0.5f,

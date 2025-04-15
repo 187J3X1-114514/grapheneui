@@ -125,6 +125,31 @@ public class NanoVGTextRenderer extends NanoVGRendererBase {
     }
 
     public TextMetrics drawAlignedText(
+            NanoVGFont fontName,
+            float fontSize,
+            String text,
+            float startX,
+            float startY,
+            float maxWidth,
+            float lineHeight,
+            NVGColor color,
+            TextAlign align,
+            boolean wrap) {
+        return drawAlignedText(
+                fontName.name,
+                fontSize,
+                text,
+                startX,
+                startY,
+                maxWidth,
+                lineHeight,
+                color,
+                align,
+                wrap
+        );
+    }
+
+    public TextMetrics drawAlignedText(
             String fontName,
             float fontSize,
             String text,
@@ -161,6 +186,19 @@ public class NanoVGTextRenderer extends NanoVGRendererBase {
         };
     }
 
+    public TextMetrics calculateTextMetrics(NanoVGFont fontName, float fontSize,
+                                            String text, float maxWidth,
+                                            float lineHeight, boolean wrap) {
+        return calculateTextMetrics(
+                fontName.name,
+                fontSize,
+                text,
+                maxWidth,
+                lineHeight,
+                wrap
+        );
+    }
+
     public TextMetrics calculateTextMetrics(String fontName, float fontSize,
                                             String text, float maxWidth,
                                             float lineHeight, boolean wrap) {
@@ -194,7 +232,7 @@ public class NanoVGTextRenderer extends NanoVGRendererBase {
 
         public TextMetrics(List<String> lines, float lineHeight, float maxLineWidth) {
             this.lines = lines;
-            this.totalHeight = lines.size() * lineHeight;
+            this.totalHeight = Math.max(lines.size() * lineHeight - 4, 0);
             this.maxLineWidth = maxLineWidth;
         }
     }

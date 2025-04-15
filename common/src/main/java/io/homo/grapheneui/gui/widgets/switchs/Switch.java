@@ -53,7 +53,7 @@ public class Switch extends AbstractWidget<Switch> {
         widthAnimator.update();
         if (isVisible()) {
             nvg.save();
-            float scale = 1 - (zoomAnimator.getFloat() * 0.08f);
+            float scale = zoom ? 1 - (zoomAnimator.getFloat() * 0.08f) : 1;
             nvg.transform(
                     Transform.identity()
                             .position(rectangle.x, rectangle.y)

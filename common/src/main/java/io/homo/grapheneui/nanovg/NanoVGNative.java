@@ -13,8 +13,4 @@ public class NanoVGNative {
     public native static long unsafeCalloc(long num, long size);
 
     public native static void unsafeFree(long address);
-
-    public static void load(String path) {
-        INSTANCE = new NanoVGNative(Path.of(path).toAbsolutePath());
-    }
 }

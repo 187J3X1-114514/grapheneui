@@ -58,7 +58,7 @@ public class NanoVGNativeLib {
         if (!loaded) {
             throw new RuntimeException("Failed to load native library after all attempts");
         }
-        NanoVGNative.load(libPath);
+        //NanoVGNative.load(libPath);
     }
 
     private static boolean tryLoadFromLibraryPath(String libName) {

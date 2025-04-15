@@ -87,7 +87,7 @@ public class HighlightRenderer extends NanoVGRendererBase {
 
     public void flash() {
         highlightAlphaAnimator
-                .animateTo(1.0, 70)
+                .animateTo(1.0, 50)
                 .ease(Easing.EASE_OUT_CUBIC)
                 .onComplete(() ->
                         highlightAlphaAnimator

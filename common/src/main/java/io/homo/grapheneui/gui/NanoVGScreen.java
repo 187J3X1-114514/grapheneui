@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
-public class NanoVGScreen extends Screen {
+public abstract class NanoVGScreen extends Screen {
     protected final NanoVGContext nvg;
     protected final ArrayList<Renderable> renderable = new ArrayList<>();
     protected final ArrayList<EventListener> eventListener = new ArrayList<>();
@@ -25,6 +25,7 @@ public class NanoVGScreen extends Screen {
     protected NanoVGScreen(Component title) {
         super(title);
         nvg = NanoVG.context;
+        buildWidgets();
     }
 
     public boolean isTransparent() {
@@ -35,6 +36,8 @@ public class NanoVGScreen extends Screen {
         this.transparent = transparent;
         return this;
     }
+
+    protected abstract void buildWidgets();
 
     @Override
     public void onClose() {
@@ -56,7 +59,6 @@ public class NanoVGScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        clearWidgets();
     }
 
     public void draw(int mouseX, int mouseY, float delta) {
@@ -65,7 +67,7 @@ public class NanoVGScreen extends Screen {
     }
 
     public void drawTooltips(int mouseX, int mouseY, float delta) {
-        for (AbstractWidget abstractWidget : widget) {
+        for (AbstractWidget<?> abstractWidget : widget) {
             abstractWidget.renderTooltip(delta);
         }
     }
@@ -79,13 +81,14 @@ public class NanoVGScreen extends Screen {
     }
 
     public void drawWidgets(int mouseX, int mouseY, float delta) {
-        for (AbstractWidget w : widget) {
+        for (AbstractWidget<?> w : widget) {
             w.render(mouseX, mouseY, delta);
         }
         for (Renderable w : renderable) {
             w.render(mouseX, mouseY, delta);
         }
     }
+
 
     @Override
     protected void clearWidgets() {
@@ -107,18 +110,23 @@ public class NanoVGScreen extends Screen {
         }
     }
 
-    protected <T extends AbstractWidget> T addWidget(T w) {
+    protected <T extends AbstractWidget<?>> T addWidget(T w) {
         widget.add(w);
         eventListener.add(w);
         return w;
     }
+
+    @Override
+    protected void rebuildWidgets() {
+    }
+
 
     protected <T extends Renderable> T addRenderableOnly(T renderable) {
         this.renderable.add(renderable);
         return renderable;
     }
 
-    protected <T extends AbstractWidget> T addRenderableWidget(T widget) {
+    protected <T extends AbstractWidget<?>> T addRenderableWidget(T widget) {
         renderable.add(widget);
         eventListener.add(widget);
         return widget;

@@ -9,6 +9,7 @@ import io.homo.grapheneui.impl.Renderable;
 import io.homo.grapheneui.impl.Vec2;
 import io.homo.grapheneui.nanovg.NanoVG;
 import io.homo.grapheneui.nanovg.NanoVGContext;
+import io.homo.grapheneui.nanovg.NanoVGFont;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,30 @@ public abstract class AbstractWidget<T> extends TooltipHolder implements EventLi
         eventListenerMap.put("hover", new ArrayList<>());
         eventListenerMap.put("press", new ArrayList<>());
         eventListenerMap.put("release", new ArrayList<>());
+    }
+
+    public float getTooltipFontSize() {
+        return tooltipRenderer.getFontSize();
+    }
+
+    public void setTooltipFontSize(float fontSize) {
+        tooltipRenderer.setFontSize(fontSize);
+    }
+
+    public NanoVGFont getTooltipFont() {
+        return tooltipRenderer.getFont();
+    }
+
+    public void setTooltipFont(NanoVGFont font) {
+        tooltipRenderer.setFont(font);
+    }
+
+    public float getTooltipRadius() {
+        return tooltipRenderer.getRadius();
+    }
+
+    public void setTooltipRadius(float radius) {
+        tooltipRenderer.setRadius(radius);
     }
 
     public void renderTooltip(float delta) {

@@ -1,0 +1,134 @@
+package io.homo.grapheneui;
+
+import io.homo.grapheneui.utils.Color;
+import io.homo.grapheneui.utils.ColorUtil;
+
+public class GrapheneTheme {
+    public Color THEME;
+    public Color THEME_TRANSITION_A;
+    public Color THEME_TRANSITION_B;
+    public Color SVG_NORMAL;
+    public Color SVG_THEME;
+    public Color LAYER_DIM;
+    public Color TOOLTIP_BG;
+    public Color INTERFACE_BG_A;
+    public Color INTERFACE_BG_B;
+    public Color INTERFACE_BG_C;
+    public Color INTERFACE_BG_D;
+    public Color INTERFACE_BG_E;
+    public Color TEXT_A;
+    public Color TEXT_B;
+    public Color TEXT_C;
+    public Color TEXT_D;
+    public Color TEXT_E;
+    public Color TEXT_THEME;
+    public Color SIDE_MSG_FLASH;
+    public Color SIDE_MSG_THEME_NORMAL;
+    public Color SIDE_MSG_THEME_SUCCESS;
+    public Color SIDE_MSG_THEME_INFO;
+    public Color SIDE_MSG_THEME_WARNING;
+    public Color SIDE_MSG_THEME_ERROR;
+    public Color MENU_BG;
+    public Color TITLE_INDICATOR;
+    public Color TITLE_HIGHLIGHT;
+    public Color BUTTON_IDLE;
+    public Color BUTTON_HOVER;
+    public Color BUTTON_FLASH;
+    public Color BUTTON_PANEL;
+    public Color BUTTON_SHADOW;
+    public Color BUTTON_THEMED_BG_A;
+    public Color BUTTON_THEMED_BG_B;
+    public Color BUTTON_THEMED_SHADOW_A;
+    public Color BUTTON_THEMED_SHADOW_B;
+    public Color BUTTON_ON;
+    public Color BUTTON_OFF;
+    public Color RADIO_BUTTON_UNCHECKED;
+    public Color RADIO_BUTTON_CHECKED;
+    public Color CHECKBOX_SVG;
+    public Color CHECKBOX_UNCHECKED;
+    public Color CHECKBOX_CHECKED;
+    public Color BUTTON_TEXT_BUTTON_IDLE;
+    public Color BUTTON_TEXT_BUTTON_FLASH;
+    public Color BUTTON_TEXT_BUTTON_HOVER;
+    public Color BUTTON_LONG_PRESS_PANEL;
+    public Color BUTTON_LONG_PRESS_SHADOW;
+    public Color BUTTON_LONG_PRESS_PROGRESS;
+    public Color SWITCH_BACKGROUND_DEACTIVATE;
+    public Color SWITCH_BACKGROUND_ACTIVATE;
+    public Color SWITCH_THUMB_ACTIVATE;
+    public Color SWITCH_THUMB_DEACTIVATE;
+    public Color SCROLL_BAR;
+    public Color PROGRESS_BAR_TRACK;
+    public Color PROGRESS_BAR_PROCESSING;
+    public Color PROGRESS_BAR_COMPLETING;
+    public Color PROGRESS_BAR_PAUSED;
+    public Color PROGRESS_BAR_FLASHES;
+
+    public GrapheneTheme() {
+    }
+
+    public GrapheneTheme dark() {
+        THEME = Color.from("#855198");
+        THEME_TRANSITION_A = Color.from("#52389a");
+        THEME_TRANSITION_B = Color.from("#9c4e8b");
+        SVG_NORMAL = Color.from("#DFDFDF");
+        SVG_THEME = Color.from("#855198");
+        LAYER_DIM = Color.from("#60000000");
+        TOOLTIP_BG = Color.from("#ef4C4554");
+        INTERFACE_BG_A = Color.from("#1C191F");
+        INTERFACE_BG_B = Color.from("#25222A");
+        INTERFACE_BG_C = Color.from("#332E38");
+        INTERFACE_BG_D = Color.from("#403a46");
+        INTERFACE_BG_E = Color.from("#4C4554");
+        TEXT_A = Color.from("#E5E5E5");
+        TEXT_B = Color.from("#DFDFDF");
+        TEXT_C = Color.from("#C7C7C7");
+        TEXT_D = Color.from("#AFAFAF");
+        TEXT_E = Color.from("#979797");
+        TEXT_THEME = Color.from("#c58bc2");
+        SIDE_MSG_FLASH = Color.from("#90FFFFFF");
+        SIDE_MSG_THEME_NORMAL = Color.from("#4C4554");
+        SIDE_MSG_THEME_SUCCESS = Color.from("#519868");
+        SIDE_MSG_THEME_INFO = Color.from("#855198");
+        SIDE_MSG_THEME_WARNING = Color.from("#986351");
+        SIDE_MSG_THEME_ERROR = Color.from("#98515b");
+        MENU_BG = Color.from("#332E38");
+        TITLE_INDICATOR = Color.from("#c58bc2");
+        TITLE_HIGHLIGHT = Color.from("#52324E");
+        BUTTON_IDLE = Color.from("#00FFFFFF");
+        BUTTON_HOVER = Color.from("#10FFFFFF");
+        BUTTON_FLASH = Color.from("#20FFFFFF");
+        BUTTON_PANEL = Color.from("#4C4554");
+        BUTTON_SHADOW = Color.from(ColorUtil.mix(INTERFACE_BG_C.hex(), "#000000", 0.9));
+        BUTTON_THEMED_BG_A = Color.from("#52389a");
+        BUTTON_THEMED_BG_B = Color.from("#9c4e8b");
+        BUTTON_THEMED_SHADOW_A = Color.from("#372456");
+        BUTTON_THEMED_SHADOW_B = Color.from("#562b49");
+        BUTTON_ON = Color.from("#372456");
+        BUTTON_OFF = Color.from("#562b49");
+        RADIO_BUTTON_UNCHECKED = Color.from("#211F25");
+        RADIO_BUTTON_CHECKED = Color.from("#9c65ae");
+        CHECKBOX_SVG = Color.from("#1C191F");
+        CHECKBOX_UNCHECKED = Color.from("#979797");
+        CHECKBOX_CHECKED = Color.from("#9c65ae");
+        BUTTON_TEXT_BUTTON_IDLE = Color.from("#c58bc2");
+        BUTTON_TEXT_BUTTON_FLASH = Color.from("#c58bc2");
+        BUTTON_TEXT_BUTTON_HOVER = Color.from("#fabef8");
+        BUTTON_LONG_PRESS_PANEL = Color.from("#932a48");
+        BUTTON_LONG_PRESS_SHADOW = Color.from("#642d41");
+        BUTTON_LONG_PRESS_PROGRESS = Color.from("#DA3462");
+
+        SWITCH_THUMB_DEACTIVATE = Color.from("#D2D2D2");
+        SWITCH_THUMB_ACTIVATE = Color.from("#0f0912");
+        SWITCH_BACKGROUND_ACTIVATE = Color.from("#a681bf");
+        SWITCH_BACKGROUND_DEACTIVATE = Color.from("#D2D2D2");
+
+        SCROLL_BAR = Color.from("#50FFFFFF");
+        PROGRESS_BAR_TRACK = Color.from("#252229");
+        PROGRESS_BAR_PROCESSING = Color.from("#66CBFF");
+        PROGRESS_BAR_COMPLETING = Color.from("#FED966");
+        PROGRESS_BAR_PAUSED = Color.from("#7F7F7F");
+        PROGRESS_BAR_FLASHES = Color.from("#FFFFFF");
+        return this;
+    }
+}

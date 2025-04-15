@@ -7,7 +7,6 @@ import io.homo.grapheneui.core.renderer.BasePanelRenderer;
 import io.homo.grapheneui.gui.widgets.AbstractWidget;
 import io.homo.grapheneui.impl.Rectangle;
 import io.homo.grapheneui.nanovg.NanoVG;
-import io.homo.grapheneui.nanovg.NanoVGFontLoader;
 import io.homo.grapheneui.nanovg.renderer.TextAlign;
 import io.homo.grapheneui.utils.Color;
 import io.homo.grapheneui.utils.MouseCursor;
@@ -39,9 +38,20 @@ public abstract class AbstractButton<T> extends AbstractWidget<T> {
         this(rectangle, null);
     }
 
-    @Override
-    public Rectangle getRectangle() {
-        return rectangle;
+    public BasePanelRenderer getPanelRenderer() {
+        return panelRenderer;
+    }
+
+    public Supplier<Optional<String>> getTextSupplier() {
+        return textSupplier;
+    }
+
+    public void setTextSupplier(Supplier<Optional<String>> textSupplier) {
+        this.textSupplier = textSupplier == null ? Optional::empty : textSupplier;
+    }
+
+    public float getRoundedSize() {
+        return roundedSize;
     }
 
     public void setRoundedSize(float roundedSize) {
@@ -49,8 +59,9 @@ public abstract class AbstractButton<T> extends AbstractWidget<T> {
         panelRenderer.setRadius(roundedSize);
     }
 
-    public void setTextSupplier(Supplier<Optional<String>> textSupplier) {
-        this.textSupplier = textSupplier == null ? Optional::empty : textSupplier;
+    @Override
+    public Rectangle getRectangle() {
+        return rectangle;
     }
 
     public void setText(String text) {
@@ -116,19 +127,19 @@ public abstract class AbstractButton<T> extends AbstractWidget<T> {
         Optional<String> text = textSupplier.get();
         if (text.isPresent()) {
             nvg.save();
-
+            nvg.transform(null);
             NanoVG.RENDERER.TEXT.drawAlignedText(
-                    NanoVGFontLoader.FONT.name,
-                    15f,
+                    GrapheneUI.regularFont(),
+                    14f,
                     text.get(),
-                    rectangle.x + (float) rectangle.width / 2,
-                    rectangle.y + GrapheneUI.CONST.BUTTON_BORDER + (float) rectangle.height / 2,
-                    rectangle.width,
-                    15,
+                    rectangle.x + rectangle.width * 0.5f,
+                    rectangle.y + rectangle.height * 0.5f,
+                    10000,
+                    1,
                     Color.rgb(255, 255, 255).nvg(),
                     TextAlign.of(
                             TextAlign.ALIGN_CENTER,
-                            TextAlign.ALIGN_BOTTOM
+                            TextAlign.ALIGN_MIDDLE
                     ),
                     false
             );

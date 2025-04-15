@@ -8,7 +8,7 @@ import io.homo.grapheneui.core.Transform;
 import io.homo.grapheneui.core.impl.TooltipHolder;
 import io.homo.grapheneui.impl.Vec2;
 import io.homo.grapheneui.nanovg.NanoVG;
-import io.homo.grapheneui.nanovg.NanoVGFontLoader;
+import io.homo.grapheneui.nanovg.NanoVGFont;
 import io.homo.grapheneui.nanovg.renderer.NanoVGTextRenderer;
 import io.homo.grapheneui.nanovg.renderer.TextAlign;
 
@@ -26,14 +26,32 @@ public class TooltipRenderer extends HighlightRenderer {
     protected int tooltipPos = TooltipRenderer.AUTO;
     protected boolean show = false;
     protected float radius = GrapheneUI.CONST.TOOLTIP_ROUNDED_SIZE;
-    private TooltipHolder tooltipHolder;
+    protected float fontSize = 15f;
+    protected NanoVGFont font = GrapheneUI.regularFont();
     private Vec2 size;
+    private TooltipHolder tooltipHolder;
     private boolean isHiding;
     private Vec2 pos = new Vec2(0);
 
     public TooltipRenderer(TooltipHolder tooltipHolder, Vec2 size) {
         this.tooltipHolder = tooltipHolder;
         this.size = size;
+    }
+
+    public float getFontSize() {
+        return fontSize;
+    }
+
+    public void setFontSize(float fontSize) {
+        this.fontSize = fontSize;
+    }
+
+    public NanoVGFont getFont() {
+        return font;
+    }
+
+    public void setFont(NanoVGFont font) {
+        this.font = font;
     }
 
     public void setPos(Vec2 pos) {
@@ -151,6 +169,8 @@ public class TooltipRenderer extends HighlightRenderer {
         float currentWidth = widthAnimator.getFloat();
         float width = getWidth();
         float height = getHeight();
+        float textWidth = getTextWidth();
+        float textHeight = getTextHeight();
         float screenWidth = NanoVG.getScreenWidth();
         float screenHeight = NanoVG.getScreenHeight();
         Vec2 position = calculatePosition(x, y, width, height, tooltipPos, screenWidth, screenHeight);
@@ -172,7 +192,7 @@ public class TooltipRenderer extends HighlightRenderer {
                     0,
                     0,
                     Math.max(width * currentWidth, 20),
-                    getHeight(),
+                    height,
                     radius,
                     GrapheneUI.THEME.TOOLTIP_BG,
                     true
@@ -181,7 +201,7 @@ public class TooltipRenderer extends HighlightRenderer {
                     0,
                     0,
                     Math.max(width * currentWidth, 20),
-                    getHeight(),
+                    height,
                     radius
             );
             nvg.restore();
@@ -191,17 +211,17 @@ public class TooltipRenderer extends HighlightRenderer {
                     baseX,
                     baseY,
                     Math.max(width * currentWidth, 20),
-                    getHeight()
+                    height
             );
-            nvg.transform(Transform.identity());
+            nvg.transform(null);
             NanoVG.RENDERER.TEXT.drawAlignedText(
-                    NanoVGFontLoader.FONT.name,
-                    15f,
+                    font,
+                    fontSize,
                     tooltip,
-                    baseX + GrapheneUI.CONST.TOOLTIP_BORDER,
-                    baseY + GrapheneUI.CONST.TOOLTIP_BORDER,
-                    getTextWidth(),
-                    17,
+                    baseX + width / 2 - textWidth / 2,
+                    baseY + height / 2 - textHeight / 2 + 1,
+                    textWidth,
+                    fontSize + 2,
                     GrapheneUI.THEME.TEXT_A.nvg(),
                     TextAlign.of(
                             TextAlign.ALIGN_LEFT,
@@ -217,22 +237,18 @@ public class TooltipRenderer extends HighlightRenderer {
 
     public NanoVGTextRenderer.TextMetrics getTooltipTextMetrics() {
         return NanoVGTextRenderer.INSTANCE.calculateTextMetrics(
-                NanoVGFontLoader.FONT.name,
-                15f,
+                font,
+                fontSize,
                 tooltipHolder.getTooltip().orElse(""),
                 (size.x == -1 ? 9999999 : size.x) - (GrapheneUI.CONST.TOOLTIP_BORDER * 2),
-                17,
+                fontSize + 2,
                 false
         );
     }
 
     public float getTextHeight() {
         NanoVGTextRenderer.TextMetrics metrics = getTooltipTextMetrics();
-        float height = 0;
-        for (String line : metrics.lines) {
-            height += NanoVG.RENDERER.TEXT.measureTextHeight(line);
-        }
-        return height;
+        return metrics.totalHeight;
     }
 
     public float getTextWidth() {
