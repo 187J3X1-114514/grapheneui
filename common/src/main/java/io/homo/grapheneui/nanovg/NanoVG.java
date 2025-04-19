@@ -1,6 +1,5 @@
 package io.homo.grapheneui.nanovg;
 
-import io.homo.grapheneui.core.Transform;
 import io.homo.grapheneui.nanovg.renderer.NanoVGSvgRenderer;
 import io.homo.grapheneui.nanovg.renderer.NanoVGTextRenderer;
 import io.homo.grapheneui.utils.MinecraftUtil;
@@ -12,7 +11,7 @@ import static org.lwjgl.nanovg.NanoVGGL3.NVG_STENCIL_STROKES;
 public class NanoVG {
     public static NanoVGRenderers RENDERER;
     public static NanoVGContext context;
-    private static Transform currentTransform;
+
 
     public static NanoVGContext getContext() {
         return context;

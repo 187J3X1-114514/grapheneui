@@ -99,14 +99,12 @@ public class ColorUtil {
         return toCode(value, false);
     }
 
-    public static String mix(String codeFore, String codePost, double weight) {
-        int[] foreArray = toArray(codeFore);
-        int[] postArray = toArray(codePost);
-        int[] mixedRgb = new int[foreArray.length];
-        for (int i = 0; i < foreArray.length; i++) {
-            mixedRgb[i] = (int) (foreArray[i] * weight + postArray[i] * (1 - weight));
-        }
-        return toCode(mixedRgb);
+    public static Color mix(Color fore, Color post, double weight) {
+        return Color.rgb(
+                (int) (fore.red() * weight + post.red() * (1 - weight)),
+                (int) (fore.green() * weight + post.green() * (1 - weight)),
+                (int) (fore.blue() * weight + post.blue() * (1 - weight))
+        );
     }
 
 }

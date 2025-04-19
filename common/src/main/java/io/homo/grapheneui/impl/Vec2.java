@@ -30,6 +30,16 @@ public class Vec2 {
         this.y = y;
     }
 
+    public void set(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public Vec2 copy() {
+        return new Vec2(x, y);
+    }
+
+
     public Vec2 add(Vec2 other) {
         return new Vec2(x + other.x, y + other.y);
     }

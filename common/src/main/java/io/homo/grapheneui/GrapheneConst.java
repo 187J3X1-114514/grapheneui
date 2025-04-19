@@ -1,7 +1,7 @@
 package io.homo.grapheneui;
 
 public class GrapheneConst {
-    public int TOOLTIP_BORDER = 8;
+    public int TOOLTIP_BORDER = 12;
     public int BUTTON_BORDER = 6;
     public int TOOLTIP_ROUNDED_SIZE = 6;
     public int BUTTON_ROUNDED_SIZE = 6;

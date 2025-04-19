@@ -17,6 +17,10 @@ public class Rectangle {
         this(0, 0, 0, 0);
     }
 
+    public Vec2 getPosition() {
+        return new Vec2(x, y);
+    }
+
     public void setBounds(int x, int y, int width, int height) {
         this.reshape(x, y, width, height);
     }

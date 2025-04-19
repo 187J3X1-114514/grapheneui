@@ -1,15 +1,24 @@
 package io.homo.grapheneui.gui;
 
 import io.homo.grapheneui.core.icon.FluentIconPack;
+import io.homo.grapheneui.core.icon.Icon;
 import io.homo.grapheneui.core.renderer.TooltipRenderer;
 import io.homo.grapheneui.gui.widgets.buttons.builder.ButtonBuilder;
 import io.homo.grapheneui.gui.widgets.sliders.builder.SliderBuilder;
 import io.homo.grapheneui.gui.widgets.switchs.builder.SwitchBuilder;
+import io.homo.grapheneui.gui.widgets.tabs.Tab;
+import io.homo.grapheneui.gui.widgets.tabs.TabBar;
+import io.homo.grapheneui.gui.widgets.tabs.TabPanel;
 import io.homo.grapheneui.impl.Rectangle;
+import io.homo.grapheneui.utils.MinecraftUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
-public class DemoScreen extends NanoVGScreen {
+public class DemoScreen extends NanoVGScreen<DemoScreen> {
+    protected TabPanel container;
+    protected Tab tab;
+    protected TabBar tabBar;
+
 
     public DemoScreen() {
         super(Component.empty());
@@ -18,27 +27,23 @@ public class DemoScreen extends NanoVGScreen {
 
     @Override
     protected void buildWidgets() {
-        addWidget(
-                ButtonBuilder.basicButton()
-                        .withRectangle(new Rectangle(10, 10, 70, 40))
-                        .withRoundedSize(8f)
-                        .withText("基础按钮")
-                        .withTooltip("43535345")
-                        .withVisibility(true)
-                        .build()
-        );
-
-        addWidget(
+        container = new TabPanel();
+        container.setRectangle(new Rectangle(
+                10,
+                10,
+                400,
+                300
+        ));
+        container.addChild(
                 ButtonBuilder.flatButton()
                         .withRectangle(new Rectangle(90, 10, 70, 40))
                         .withRoundedSize(8f)
-                        .withText("浮动按钮")
+                        .withText("扁平按钮")
                         .withTooltip("345534534534\n5645645646")
                         .withVisibility(true)
                         .build()
         );
-
-        addWidget(
+        container.addChild(
                 ButtonBuilder.pressButton()
                         .withRectangle(new Rectangle(170, 10, 70, 40))
                         .withRoundedSize(8f)
@@ -48,8 +53,7 @@ public class DemoScreen extends NanoVGScreen {
                         .withVisibility(true)
                         .build()
         );
-
-        addWidget(
+        container.addChild(
                 ButtonBuilder.iconButton()
                         .withRectangle(new Rectangle(250, 10, 70, 40))
                         .withRoundedSize(8f)
@@ -59,8 +63,7 @@ public class DemoScreen extends NanoVGScreen {
                         .withVisibility(true)
                         .build()
         );
-
-        addWidget(
+        container.addChild(
                 new SliderBuilder()
                         .withRectangle(new Rectangle(10, 60, 250, 20))
                         .withTooltip("滑块")
@@ -71,8 +74,7 @@ public class DemoScreen extends NanoVGScreen {
                         .withValue(2)
                         .build()
         );
-
-        addWidget(
+        container.addChild(
                 new SwitchBuilder()
                         .withRectangle(new Rectangle(10, 100, 40, 20))
                         .withTooltip("开关")
@@ -81,8 +83,7 @@ public class DemoScreen extends NanoVGScreen {
                         .withZoom(false)
                         .build()
         );
-
-        addWidget(
+        container.addChild(
                 new SwitchBuilder()
                         .withRectangle(new Rectangle(60, 100, 40, 20))
                         .withTooltip("开关")
@@ -91,8 +92,7 @@ public class DemoScreen extends NanoVGScreen {
                         .withZoom(false)
                         .build()
         );
-
-        addWidget(
+        container.addChild(
                 new SwitchBuilder()
                         .withRectangle(new Rectangle(110, 100, 40, 20))
                         .withTooltip("开关")
@@ -101,16 +101,53 @@ public class DemoScreen extends NanoVGScreen {
                         .withZoom(true)
                         .build()
         );
+        this.tab = new Tab().setTabIcon((Icon) FluentIconPack.regular().values().toArray()[0]);
 
-        addWidget(
-                new SwitchBuilder()
-                        .withRectangle(new Rectangle(170, 100, 200, 40))
-                        .withTooltip("开关")
-                        .withTooltipPosition(TooltipRenderer.RIGHT)
-                        .withChecked(true)
-                        .withZoom(true)
-                        .build()
+        tabBar = new TabBar();
+        tabBar.setRectangle(
+                new Rectangle(
+                        0,
+                        0,
+                        (int) MinecraftUtil.getScreenSize().x,
+                        (int) MinecraftUtil.getScreenSize().y
+                )
         );
+        tabBar.addTab(tab, container);
+        tabBar.addTab(
+                new Tab()
+                        .setTabText("fhfghfghfgh")
+                        .setTabIcon((Icon) FluentIconPack.regular().values().toArray()[20]),
+                container
+        );
+        tabBar.addTab(
+                new Tab()
+                        .setTabText("sdfsdfsdfsdf")
+                        .setTabIcon((Icon) FluentIconPack.regular().values().toArray()[8]),
+                container
+        );
+        tabBar.addTab(
+                new Tab()
+                        .setTabText("345634534534")
+                        .setTabIcon((Icon) FluentIconPack.regular().values().toArray()[1]),
+                container
+        );
+        tabBar.addTab(
+                new Tab()
+                        .setTabText("dfhfgjfj568")
+                        .setTabIcon((Icon) FluentIconPack.regular().values().toArray()[40]),
+                container
+        );
+        addWidget(tabBar);
+        addEventListener("resize", (screen) -> {
+            tabBar.setRectangle(
+                    new Rectangle(
+                            0,
+                            0,
+                            (int) MinecraftUtil.getScreenSize().x,
+                            (int) MinecraftUtil.getScreenSize().y
+                    )
+            );
+        });
     }
 
     @Override
@@ -120,6 +157,7 @@ public class DemoScreen extends NanoVGScreen {
 
     @Override
     public void draw(int mouseX, int mouseY, float delta) {
+        tab.setTabText("fhfghfghfgh");
         super.draw(mouseX, mouseY, delta);
     }
 

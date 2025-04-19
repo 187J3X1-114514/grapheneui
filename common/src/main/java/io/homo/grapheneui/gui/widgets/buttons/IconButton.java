@@ -17,10 +17,14 @@ public class IconButton extends FlatButton<IconButton> {
 
     public IconButton(Rectangle rectangle, Supplier<Optional<Icon>> iconSupplier) {
         super(rectangle);
-        this.iconSupplier = iconSupplier;
+        setIconSupplier(iconSupplier);
     }
 
     public void setIconSupplier(Supplier<Optional<Icon>> iconSupplier) {
+        if (iconSupplier == null) {
+            this.iconSupplier = Optional::empty;
+            return;
+        }
         this.iconSupplier = iconSupplier;
     }
 

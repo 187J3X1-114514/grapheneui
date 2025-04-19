@@ -1,5 +1,6 @@
 package io.homo.grapheneui.gui;
 
+import io.homo.grapheneui.core.impl.EventHandle;
 import io.homo.grapheneui.core.impl.EventListener;
 import io.homo.grapheneui.gui.widgets.AbstractWidget;
 import io.homo.grapheneui.impl.Renderable;
@@ -12,21 +13,36 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public abstract class NanoVGScreen extends Screen {
+public abstract class NanoVGScreen<T> extends Screen implements EventHandle<T> {
     protected final NanoVGContext nvg;
     protected final ArrayList<Renderable> renderable = new ArrayList<>();
     protected final ArrayList<EventListener> eventListener = new ArrayList<>();
-    protected final ArrayList<AbstractWidget> widget = new ArrayList<>();
+    protected final ArrayList<AbstractWidget<?>> widget = new ArrayList<>();
     protected boolean transparent = false;
+    protected Map<String, ArrayList<Consumer<T>>> eventListenerMap = new HashMap<>();
 
     protected NanoVGScreen(Component title) {
         super(title);
+        eventListenerMap.put("resize", new ArrayList<>());
         nvg = NanoVG.context;
         buildWidgets();
     }
+
+    @Override
+    public void removeEventListener(String type, Consumer<T> consumer) {
+        if (eventListenerMap.get(type) != null) eventListenerMap.get(type).remove(consumer);
+    }
+
+    @Override
+    public void addEventListener(String type, Consumer<T> consumer) {
+        if (eventListenerMap.get(type) != null) eventListenerMap.get(type).add(consumer);
+    }
+
 
     public boolean isTransparent() {
         return transparent;
@@ -59,6 +75,12 @@ public abstract class NanoVGScreen extends Screen {
     @Override
     protected void init() {
         super.init();
+        invokeEventListener("resize");
+    }
+
+    protected void invokeEventListener(String type) {
+        if (eventListenerMap.get(type) != null)
+            for (Consumer<T> consumer : eventListenerMap.get(type)) consumer.accept((T) this);
     }
 
     public void draw(int mouseX, int mouseY, float delta) {
@@ -81,12 +103,16 @@ public abstract class NanoVGScreen extends Screen {
     }
 
     public void drawWidgets(int mouseX, int mouseY, float delta) {
-        for (AbstractWidget<?> w : widget) {
-            w.render(mouseX, mouseY, delta);
-        }
-        for (Renderable w : renderable) {
-            w.render(mouseX, mouseY, delta);
-        }
+        Map<Integer, List<Renderable>> layers = Stream.concat(renderable.stream(), widget.stream())
+                .collect(Collectors.groupingBy(
+                        Renderable::getZIndex,
+                        TreeMap::new,
+                        Collectors.toList()
+                ));
+
+        layers.values().forEach(layer ->
+                layer.forEach(r -> r.render(mouseX, mouseY, delta))
+        );
     }
 
 

@@ -39,15 +39,7 @@ public class SliderBuilder extends AbstractWidgetBuilder<Slider, SliderBuilder> 
     public Slider build() {
         validate();
         Slider slider = new Slider(rectangle, step, max, min, value);
-        if (tooltip != null) {
-            slider.setTooltip(tooltip);
-        } else if (tooltipSupplier != null) {
-            slider.setTooltipSupplier(tooltipSupplier);
-        }
-        slider.setTooltipFontSize(tooltipFontSize);
-        slider.setTooltipFont(tooltipFont);
-        slider.setTooltipRadius(tooltipRadius);
-        slider.setTooltipPos(tooltipPos);
+        configureWidget(slider);
         return slider;
     }
 

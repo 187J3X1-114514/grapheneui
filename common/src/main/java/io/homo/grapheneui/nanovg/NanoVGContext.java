@@ -17,11 +17,13 @@ import org.lwjgl.nanovg.NanoVGGL3;
 import static org.lwjgl.nanovg.NanoVG.*;
 import static org.lwjgl.opengl.GL30.*;
 
-public class NanoVGContext implements AutoCloseable {
+public class NanoVGContext {
+
+    private static Transform S_currentTransform;
+    private static Transform S_globalTransform;
     public GlFrameBuffer frameBuffer;
     public long contextPtr = -1;
     public long rastPtr = -1;
-
     /// 状态
     private Color S_fillColor = Color.black();
     private Color S_strokeColor = Color.black();
@@ -102,11 +104,6 @@ public class NanoVGContext implements AutoCloseable {
 
     public void restore() {
         NanoVG.nvgRestore(contextPtr);
-    }
-
-    @Override
-    public void close() {
-        end();
     }
 
     public void line(
@@ -236,14 +233,43 @@ public class NanoVGContext implements AutoCloseable {
     }
 
     public void transform(Transform transform) {
-        if (transform == null) {
-            nvgResetTransform(contextPtr);
+        resetTransform();
+
+        if (S_globalTransform != null) {
+            float[] globalMat = S_globalTransform.transformMatrix();
+            nvgTransform(contextPtr, globalMat[0], globalMat[1], globalMat[2],
+                    globalMat[3], globalMat[4], globalMat[5]);
+        }
+
+        if (transform != null) {
+            float[] mat = transform.transformMatrix();
+            nvgTransform(contextPtr, mat[0], mat[1], mat[2], mat[3], mat[4], mat[5]);
+            S_currentTransform = transform;
+        }
+    }
+
+    public void globalTransform(Transform globalTransform) {
+        if (globalTransform == null) {
+            S_globalTransform = null;
+            if (S_currentTransform != null) {
+                transform(S_currentTransform);
+            }
             return;
         }
-        float[] mat = transform.transformMatrix();
-        nvgResetTransform(contextPtr);
-        nvgTransform(contextPtr, mat[0], mat[1], mat[2], mat[3], mat[4], mat[5]);
+        S_globalTransform = globalTransform;
+        transform(null);
     }
+
+    public void resetTransform() {
+        nvgResetTransform(contextPtr);
+        S_currentTransform = null;
+    }
+
+    public void resetGlobalTransform() {
+        nvgResetTransform(contextPtr);
+        S_globalTransform = null;
+    }
+
 
     public NVGPaint linearGradient(
             float startX,

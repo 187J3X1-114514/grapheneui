@@ -42,6 +42,7 @@ public abstract class AbstractButtonBuilder<T extends AbstractButton<?>, B exten
     public T build() {
         validate();
         T button = createButton();
+        configureWidget(button);
         configureButton(button);
         return button;
     }
@@ -55,22 +56,10 @@ public abstract class AbstractButtonBuilder<T extends AbstractButton<?>, B exten
     protected void configureButton(AbstractButton<?> button) {
         button.setRoundedSize(roundedSize);
         button.setVisible(visible);
-
         if (text != null) {
             button.setText(text);
         } else if (textSupplier != null) {
             button.setTextSupplier(textSupplier);
         }
-
-        if (tooltip != null) {
-            button.setTooltip(tooltip);
-        } else if (tooltipSupplier != null) {
-            button.setTooltipSupplier(tooltipSupplier);
-        }
-
-        button.setTooltipFontSize(tooltipFontSize);
-        button.setTooltipFont(tooltipFont);
-        button.setTooltipRadius(tooltipRadius);
-        button.setTooltipPos(tooltipPos);
     }
 }

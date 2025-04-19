@@ -8,8 +8,17 @@ import io.homo.grapheneui.utils.Color;
 public class HighlightRenderer extends NanoVGRendererBase {
     protected final NumberAnimator highlightAlphaAnimator = NumberAnimator.create();
     protected final NumberAnimator hoverAlphaAnimator = NumberAnimator.create();
+    protected final NumberAnimator checkAlphaAnimator = NumberAnimator.create();
+
     protected int highlightAlpha = 127;
     protected int hoverAlpha = 30;
+    protected int checkAlpha = 40;
+
+    protected boolean hovered;
+    protected boolean flashing;
+    protected boolean checked;
+    private boolean _checked;
+
 
     public HighlightRenderer(int highlightAlpha, int hoverAlpha) {
         this.highlightAlpha = highlightAlpha;
@@ -30,21 +39,25 @@ public class HighlightRenderer extends NanoVGRendererBase {
     public void updateHighlight(float delta) {
         highlightAlphaAnimator.update();
         hoverAlphaAnimator.update();
+        checkAlphaAnimator.update();
     }
 
     public void renderHighlight(float x, float y,
                                 float width, float height,
                                 float radius) {
         nvg.save();
-
-        Color color = Color.rgba(255, 255, 255, (int) (hoverAlpha * hoverAlphaAnimator.getFloat()));
+        Color hoverColor = Color.rgba(255, 255, 255, (int) (
+                        _checked ? checkAlpha * checkAlphaAnimator.getFloat() :
+                                hoverAlpha * hoverAlphaAnimator.getFloat()
+                )
+        );
         if (radius == 0) {
             nvg.drawRect(
                     x,
                     y,
                     width,
                     height,
-                    color,
+                    hoverColor,
                     true
             );
         } else {
@@ -54,19 +67,19 @@ public class HighlightRenderer extends NanoVGRendererBase {
                     width,
                     height,
                     radius,
-                    color,
+                    hoverColor,
                     true
             );
         }
 
-        color = Color.rgba(255, 255, 255, (int) (highlightAlpha * highlightAlphaAnimator.getFloat()));
+        Color highlightColor = Color.rgba(255, 255, 255, (int) (highlightAlpha * highlightAlphaAnimator.getFloat()));
         if (radius == 0) {
             nvg.drawRect(
                     x,
                     y,
                     width,
                     height,
-                    color,
+                    highlightColor,
                     true
             );
         } else {
@@ -76,26 +89,27 @@ public class HighlightRenderer extends NanoVGRendererBase {
                     width,
                     height,
                     radius,
-                    color,
+                    highlightColor,
                     true
             );
         }
         nvg.restore();
-
-
     }
 
     public void flash() {
+        this.flashing = true;
         highlightAlphaAnimator
                 .animateTo(1.0, 50)
                 .ease(Easing.EASE_OUT_CUBIC)
                 .onComplete(() ->
                         highlightAlphaAnimator
                                 .animateTo(0.0, 160)
-                                .ease(Easing.LINEAR));
+                                .ease(Easing.LINEAR)
+                                .onComplete(() -> this.flashing = false));
     }
 
     public void setHover(boolean hover) {
+        this.hovered = hover;
         if (hover) {
             hoverAlphaAnimator
                     .animateTo(1.0, 100)
@@ -105,5 +119,37 @@ public class HighlightRenderer extends NanoVGRendererBase {
                     .animateTo(0.0, 100)
                     .ease(Easing.LINEAR);
         }
+    }
+
+    public boolean isHovered() {
+        return hovered;
+    }
+
+    public boolean isFlashing() {
+        return flashing;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        if (checked != this.checked) {
+            if (checked) {
+                _checked = true;
+                if (hovered) checkAlphaAnimator.set(hoverAlphaAnimator.getFloat());
+                checkAlphaAnimator
+                        .animateTo(1.0, 100)
+                        .ease(Easing.LINEAR);
+            } else {
+                checkAlphaAnimator
+                        .animateTo(0.0, 100)
+                        .ease(Easing.LINEAR)
+                        .onComplete(() -> {
+                            _checked = false;
+                        });
+            }
+        }
+        this.checked = checked;
     }
 }

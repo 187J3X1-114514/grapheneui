@@ -16,7 +16,7 @@ public abstract class AbstractWidgetBuilder<W, B> {
     protected float tooltipRadius = GrapheneUI.CONST.TOOLTIP_ROUNDED_SIZE;
     protected float tooltipFontSize = 15f;
     protected NanoVGFont tooltipFont = GrapheneUI.regularFont();
-    private Vec2 tooltipSize = new Vec2(-1, -1);
+    protected Vec2 tooltipSize = new Vec2(-1, -1);
 
     @SuppressWarnings("unchecked")
     public B withTextSupplier(Supplier<Optional<String>> textSupplier) {
@@ -70,6 +70,19 @@ public abstract class AbstractWidgetBuilder<W, B> {
     public B withTooltipSize(float width, float height) {
         this.tooltipSize = new Vec2(width, height);
         return (B) this;
+    }
+
+    protected void configureWidget(AbstractWidget<?> widget) {
+        if (tooltip != null) {
+            widget.setTooltip(tooltip);
+        } else if (tooltipSupplier != null) {
+            widget.setTooltipSupplier(tooltipSupplier);
+        }
+        widget.setTooltipFontSize(tooltipFontSize);
+        widget.setTooltipFont(tooltipFont);
+        widget.setTooltipRadius(tooltipRadius);
+        widget.getTooltipRenderer().setSize(tooltipSize);
+        widget.setTooltipPos(tooltipPos);
     }
 
     public abstract W build();

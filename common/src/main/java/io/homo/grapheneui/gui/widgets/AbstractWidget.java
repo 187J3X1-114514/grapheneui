@@ -25,6 +25,7 @@ public abstract class AbstractWidget<T> extends TooltipHolder implements EventLi
     protected boolean pressed;
     protected boolean focused;
     protected int tooltipPos = TooltipRenderer.AUTO;
+    protected int zIndex = 0;
     protected Map<String, ArrayList<Consumer<T>>> eventListenerMap = new HashMap<>();
     protected TooltipRenderer tooltipRenderer = new TooltipRenderer(this, new Vec2(-1, -1));
 
@@ -33,6 +34,14 @@ public abstract class AbstractWidget<T> extends TooltipHolder implements EventLi
         eventListenerMap.put("hover", new ArrayList<>());
         eventListenerMap.put("press", new ArrayList<>());
         eventListenerMap.put("release", new ArrayList<>());
+    }
+
+    public int getZIndex() {
+        return zIndex;
+    }
+
+    public void setZIndex(int zIndex) {
+        this.zIndex = zIndex;
     }
 
     public float getTooltipFontSize() {
@@ -149,4 +158,6 @@ public abstract class AbstractWidget<T> extends TooltipHolder implements EventLi
     }
 
     public abstract Rectangle getRectangle();
+
+
 }

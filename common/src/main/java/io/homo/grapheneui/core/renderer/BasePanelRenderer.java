@@ -51,6 +51,7 @@ public class BasePanelRenderer extends HighlightRenderer {
 
     public void renderPanel(float width, float height, float delta) {
         nvg.save();
+        nvg.globalAlpha(1.0f);
         if (shadow) {
             nvg.drawRoundedRect(
                     0,
@@ -70,13 +71,6 @@ public class BasePanelRenderer extends HighlightRenderer {
                     panelColor,
                     true
             );
-            this.renderHighlight(
-                    0,
-                    0,
-                    width,
-                    height - GrapheneUI.CONST.SHADOW_HEIGHT,
-                    radius
-            );
         } else {
             nvg.drawRoundedRect(
                     0,
@@ -87,14 +81,14 @@ public class BasePanelRenderer extends HighlightRenderer {
                     panelColor,
                     true
             );
-            this.renderHighlight(
-                    0,
-                    0,
-                    width,
-                    height - GrapheneUI.CONST.SHADOW_HEIGHT,
-                    radius
-            );
         }
+        if (clickable) this.renderHighlight(
+                0,
+                0,
+                width,
+                height - GrapheneUI.CONST.SHADOW_HEIGHT,
+                radius
+        );
         nvg.restore();
     }
 

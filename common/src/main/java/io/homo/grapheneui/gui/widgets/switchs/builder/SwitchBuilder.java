@@ -29,15 +29,7 @@ public class SwitchBuilder extends AbstractWidgetBuilder<Switch, SwitchBuilder> 
         Switch switchWidget = new Switch(rectangle);
         switchWidget.setChecked(checked);
         switchWidget.setZoom(zoom);
-        if (tooltip != null) {
-            switchWidget.setTooltip(tooltip);
-        } else if (tooltipSupplier != null) {
-            switchWidget.setTooltipSupplier(tooltipSupplier);
-        }
-        switchWidget.setTooltipFontSize(tooltipFontSize);
-        switchWidget.setTooltipFont(tooltipFont);
-        switchWidget.setTooltipRadius(tooltipRadius);
-        switchWidget.setTooltipPos(tooltipPos);
+        configureWidget(switchWidget);
         return switchWidget;
     }
 

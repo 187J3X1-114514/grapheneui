@@ -99,7 +99,7 @@ public class GrapheneTheme {
         BUTTON_HOVER = Color.from("#10FFFFFF");
         BUTTON_FLASH = Color.from("#20FFFFFF");
         BUTTON_PANEL = Color.from("#4C4554");
-        BUTTON_SHADOW = Color.from(ColorUtil.mix(INTERFACE_BG_C.hex(), "#000000", 0.9));
+        BUTTON_SHADOW = ColorUtil.mix(INTERFACE_BG_C, Color.black(), 0.9);
         BUTTON_THEMED_BG_A = Color.from("#52389a");
         BUTTON_THEMED_BG_B = Color.from("#9c4e8b");
         BUTTON_THEMED_SHADOW_A = Color.from("#372456");

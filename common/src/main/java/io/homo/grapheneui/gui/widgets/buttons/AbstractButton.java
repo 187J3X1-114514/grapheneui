@@ -19,12 +19,11 @@ public abstract class AbstractButton<T> extends AbstractWidget<T> {
     public Rectangle rectangle;
     protected BasePanelRenderer panelRenderer = new BasePanelRenderer(
             GrapheneUI.THEME.BUTTON_PANEL,
-            GrapheneUI.THEME.INTERFACE_BG_C,
+            GrapheneUI.THEME.BUTTON_SHADOW,
             BasePanelRenderer.PanelVariant.FILLED
-    ).shadow(true);
+    ).shadow(true).clickable(true);
     protected Supplier<Optional<String>> textSupplier;
     protected float roundedSize = GrapheneUI.CONST.BUTTON_ROUNDED_SIZE;
-
     public AbstractButton(Rectangle rectangle, Supplier<Optional<String>> textSupplier) {
         super();
         panelRenderer.setRadius(roundedSize);
@@ -62,6 +61,10 @@ public abstract class AbstractButton<T> extends AbstractWidget<T> {
     @Override
     public Rectangle getRectangle() {
         return rectangle;
+    }
+
+    public void setRectangle(Rectangle rectangle) {
+        this.rectangle = rectangle;
     }
 
     public void setText(String text) {
