@@ -14,10 +14,10 @@ public class HighlightRenderer extends NanoVGRendererBase {
     protected int hoverAlpha = 30;
     protected int checkAlpha = 40;
 
-    protected boolean hovered;
-    protected boolean flashing;
-    protected boolean checked;
-    private boolean _checked;
+    protected boolean hovered = false;
+    protected boolean flashing = false;
+    protected boolean checked = false;
+    private boolean _checked = false;
 
 
     public HighlightRenderer(int highlightAlpha, int hoverAlpha) {
@@ -135,9 +135,11 @@ public class HighlightRenderer extends NanoVGRendererBase {
 
     public void setChecked(boolean checked) {
         if (checked != this.checked) {
+            this.checked = checked;
             if (checked) {
+                setHover(false);
                 _checked = true;
-                if (hovered) checkAlphaAnimator.set(hoverAlphaAnimator.getFloat());
+                checkAlphaAnimator.set(0.0f);
                 checkAlphaAnimator
                         .animateTo(1.0, 100)
                         .ease(Easing.LINEAR);
@@ -150,6 +152,6 @@ public class HighlightRenderer extends NanoVGRendererBase {
                         });
             }
         }
-        this.checked = checked;
+
     }
 }

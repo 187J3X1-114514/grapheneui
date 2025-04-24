@@ -7,6 +7,7 @@ import io.homo.grapheneui.core.Transform;
 import io.homo.grapheneui.gui.widgets.containers.Container;
 import io.homo.grapheneui.impl.Rectangle;
 import io.homo.grapheneui.utils.Color;
+import io.homo.grapheneui.utils.ColorUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,15 +23,23 @@ public class TabBar extends Container {
     private float targetSliderY;
 
     public TabBar() {
-        panelRenderer.shadow(false).panelColor(Color.rgba(0, 0, 0, 0));
+        panelRenderer.shadow(false).panelColor(
+                ColorUtil.mix(
+                        GrapheneUI.THEME.INTERFACE_BG_C,
+                        Color.rgb(0xFFFFFF),
+                        0.95
+                )
+        );
     }
 
     public void setCurrentTab(Tab currentTab) {
-        if (this.currentTab != null) {
+        if (this.currentTab != null && this.currentTab != currentTab) {
             this.currentTab.getPanelRenderer().setChecked(false);
+            this.currentTab.getPanelRenderer().setHover(false);
         }
         if (this.currentTab != currentTab) {
             currentTab.getPanelRenderer().setChecked(true);
+            currentTab.getPanelRenderer().setHover(false);
             this.currentTab = currentTab;
             sliderY.animateTo(getSliderTargetY(), 250)
                     .ease(Easing.EASE_OUT_QUINT);
@@ -44,6 +53,16 @@ public class TabBar extends Container {
         arrangeTabs();
         super.render(mouseX, mouseY, delta);
         renderSlider(delta);
+        if (getCurrentPanel() != null) {
+            TabPanel tabPanel = getCurrentPanel();
+            tabPanel.setRectangle(new Rectangle(
+                    rectangle.x + 47,
+                    rectangle.y + 2,
+                    rectangle.width - 47,
+                    rectangle.height - 2
+            ));
+            tabPanel.render(mouseX, mouseY, delta);
+        }
         nvg.restore();
     }
 
@@ -107,6 +126,15 @@ public class TabBar extends Container {
         nvg.restore();
     }
 
+    public TabPanel getCurrentPanel() {
+        if (currentTab != null) {
+            if (tabMap.get(currentTab) != null) {
+                return tabMap.get(currentTab);
+            }
+        }
+        return null;
+    }
+
     private float getSliderTargetY() {
         return currentTab != null ? currentTab.getRectangle().y : 0;
     }
@@ -115,5 +143,97 @@ public class TabBar extends Container {
         tabMap.put(tab, panel);
         addChild(tab);
         return this;
+    }
+
+    @Override
+    public void mouseMove(float x, float y) {
+        super.mouseMove(x, y);
+        x = x - getRectangle().x;
+        y = y - getRectangle().y;
+        float finalX = x;
+        float finalY = y;
+        if (getCurrentPanel() != null) {
+            getCurrentPanel().mouseMove(finalX, finalY);
+        }
+    }
+
+    @Override
+    public void mousePress(float x, float y, int button) {
+        super.mousePress(x, y, button);
+        x = x - getRectangle().x;
+        y = y - getRectangle().y;
+        float finalX = x;
+        float finalY = y;
+        if (getCurrentPanel() != null) {
+            getCurrentPanel().mousePress(finalX, finalY, button);
+        }
+    }
+
+    @Override
+    public void mouseRelease(float x, float y, int button) {
+        super.mouseRelease(x, y, button);
+        x = x - getRectangle().x;
+        y = y - getRectangle().y;
+        float finalX = x;
+        float finalY = y;
+        if (getCurrentPanel() != null) {
+            getCurrentPanel().mouseRelease(finalX, finalY, button);
+        }
+    }
+
+    @Override
+    public void mouseDrag(float mouseX, float mouseY, float dragX, float dragY, int button) {
+        super.mouseDrag(mouseX, mouseY, dragX, dragY, button);
+        mouseX = mouseX - getRectangle().x;
+        mouseY = mouseY - getRectangle().y;
+        float finalX = mouseX;
+        float finalY = mouseY;
+        if (getCurrentPanel() != null) {
+            getCurrentPanel().mouseDrag(finalX, finalY, dragX, dragY, button);
+        }
+    }
+
+    @Override
+    public void mouseScroll(float x, float y, double scrollX) {
+        super.mouseScroll(x, y, scrollX);
+        x = x - getRectangle().x;
+        y = y - getRectangle().y;
+        float finalX = x;
+        float finalY = y;
+        if (getCurrentPanel() != null) {
+            getCurrentPanel().mouseScroll(finalX, finalY, scrollX);
+        }
+    }
+
+    @Override
+    public void keyPress(int keyCode, int scancode, int modifiers) {
+        super.keyPress(keyCode, scancode, modifiers);
+        if (getCurrentPanel() != null) {
+            getCurrentPanel().keyPress(keyCode, scancode, modifiers);
+        }
+    }
+
+    @Override
+    public void keyRelease(int keyCode, int scancode, int modifiers) {
+        super.keyRelease(keyCode, scancode, modifiers);
+        if (getCurrentPanel() != null) {
+            getCurrentPanel().keyRelease(keyCode, scancode, modifiers);
+        }
+    }
+
+    @Override
+    public void charTyped(char codePoint, int modifiers) {
+        super.charTyped(codePoint, modifiers);
+        if (getCurrentPanel() != null) {
+            getCurrentPanel().charTyped(codePoint, modifiers);
+        }
+    }
+
+    @Override
+    public void renderTooltip(float delta) {
+        super.renderTooltip(delta);
+        if (getCurrentPanel() != null) {
+            getCurrentPanel().renderTooltip(delta);
+        }
     }
 }

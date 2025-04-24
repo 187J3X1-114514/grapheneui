@@ -78,6 +78,12 @@ public abstract class NanoVGScreen<T> extends Screen implements EventHandle<T> {
         invokeEventListener("resize");
     }
 
+    @Override
+    public void resize(@NotNull Minecraft minecraft, int width, int height) {
+        super.resize(minecraft, width, height);
+        invokeEventListener("resize");
+    }
+
     protected void invokeEventListener(String type) {
         if (eventListenerMap.get(type) != null)
             for (Consumer<T> consumer : eventListenerMap.get(type)) consumer.accept((T) this);
