@@ -225,6 +225,6 @@ public abstract class NanoVGScreen<T> extends Screen implements EventHandle<T> {
     }
 
     protected double transformPos(double pos) {
-        return Minecraft.getInstance().getWindow().getGuiScale() * pos;
+        return (Minecraft.getInstance().getWindow().getGuiScale() * pos) / nvg.globalScale();
     }
 }

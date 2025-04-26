@@ -55,21 +55,21 @@ public class NanoVGTextRenderer extends NanoVGRendererBase {
     public float measureTextWidth(String text) {
         float[] bounds = new float[4];
         NanoVG.nvgTextBounds(contextPtr, 0, 0, text, bounds);
-        return bounds[2] - bounds[0];
+        return (bounds[2] - bounds[0]);
     }
 
     public float measureTextHeight(String text) {
         float[] bounds = new float[4];
         NanoVG.nvgTextBounds(contextPtr, 0, 0, text, bounds);
-        return bounds[3] - bounds[1];
+        return (bounds[3] - bounds[1]);
     }
 
     public Vec2 measureText(String text) {
         float[] bounds = new float[4];
         NanoVG.nvgTextBounds(contextPtr, 0, 0, text, bounds);
         return new Vec2(
-                bounds[2] - bounds[0],
-                bounds[3] - bounds[1]
+                (bounds[2] - bounds[0]),
+                (bounds[3] - bounds[1])
         );
     }
 
@@ -203,6 +203,7 @@ public class NanoVGTextRenderer extends NanoVGRendererBase {
                                             String text, float maxWidth,
                                             float lineHeight, boolean wrap) {
         nvgSave(contextPtr);
+
         nvgFontSize(contextPtr, fontSize);
         nvgFontFace(contextPtr, fontName);
 

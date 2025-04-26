@@ -8,6 +8,7 @@ import io.homo.grapheneui.opengl.framebuffer.GlFrameBuffer;
 import io.homo.grapheneui.opengl.texture.TextureFormat;
 import io.homo.grapheneui.utils.Color;
 import io.homo.grapheneui.utils.MinecraftUtil;
+import io.homo.grapheneui.utils.UIScalingCalculator;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.nanovg.NVGPaint;
 import org.lwjgl.nanovg.NanoSVG;
@@ -24,13 +25,12 @@ public class NanoVGContext {
     public GlFrameBuffer frameBuffer;
     public long contextPtr = -1;
     public long rastPtr = -1;
+    public float globalScale = 1.0f;
     /// 状态
     private Color S_fillColor = Color.black();
     private Color S_strokeColor = Color.black();
     private float S_strokeWidth = 1f;
     private float S_alpha = 1f;
-
-    ///
 
     public NanoVGContext(int nvgFlags) {
         contextPtr = NanoVGGL3.nvgCreate(nvgFlags);
@@ -42,6 +42,16 @@ public class NanoVGContext {
                 (int) MinecraftUtil.getScreenSize().y
         );
         frameBuffer.setClearColor(0, 0, 0, 1);
+    }
+
+    public float globalScale() {
+        return globalScale;
+    }
+
+    ///
+
+    public void globalScale(float globalScale) {
+        this.globalScale = globalScale;
     }
 
     public void begin(boolean copyMinecraftFbo) {
@@ -78,6 +88,9 @@ public class NanoVGContext {
                 screenSize.y,
                 1.0f
         );
+        nvgReset(contextPtr);
+        nvgScale(contextPtr, 1, 1);
+        globalScale = (float) Math.max(UIScalingCalculator.calculateUIScaling((int) screenSize.x, (int) screenSize.y, 1.2f), 1);
     }
 
     public void end() {
@@ -231,16 +244,15 @@ public class NanoVGContext {
     ) {
         NanoVG.nvgScissor(
                 contextPtr,
-                x,
-                y,
-                width,
-                height
+                x * globalScale(),
+                y * globalScale(),
+                width * globalScale(),
+                height * globalScale()
         );
     }
 
     public void transform(Transform transform) {
         resetTransform();
-
         if (S_globalTransform != null) {
             float[] globalMat = S_globalTransform.transformMatrix();
             nvgTransform(contextPtr, globalMat[0], globalMat[1], globalMat[2],
@@ -268,11 +280,17 @@ public class NanoVGContext {
 
     public void resetTransform() {
         nvgResetTransform(contextPtr);
+        float[] globalScaleMat = Transform.identity().scale(globalScale).transformMatrix();
+        nvgTransform(contextPtr, globalScaleMat[0], globalScaleMat[1], globalScaleMat[2],
+                globalScaleMat[3], globalScaleMat[4], globalScaleMat[5]);
         S_currentTransform = null;
     }
 
     public void resetGlobalTransform() {
         nvgResetTransform(contextPtr);
+        float[] globalScaleMat = Transform.identity().scale(globalScale).transformMatrix();
+        nvgTransform(contextPtr, globalScaleMat[0], globalScaleMat[1], globalScaleMat[2],
+                globalScaleMat[3], globalScaleMat[4], globalScaleMat[5]);
         S_globalTransform = null;
     }
 

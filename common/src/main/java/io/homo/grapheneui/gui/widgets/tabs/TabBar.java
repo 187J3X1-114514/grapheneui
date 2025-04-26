@@ -105,12 +105,12 @@ public class TabBar extends Container {
         nvg.resetTransform();
         /////////
         nvg.scissor(
-                rectangle.x + 47,
-                rectangle.y + 2,
+                (rectangle.x + 47) / nvg.globalScale(),
+                rectangle.y + 2 / nvg.globalScale(),
                 rectangle.width - 47,
                 rectangle.height - 2
         );
-        if (getLastPanel() != null) {
+        if (getLastPanel() != null && (panelAlphaAnimator.getFloat()) > 0) {
             TabPanel lastPanel = getLastPanel();
             nvg.globalAlpha(panelAlphaAnimator.getFloat());
             lastPanel.setRectangle(new Rectangle(
@@ -121,9 +121,8 @@ public class TabBar extends Container {
             ));
             lastPanel.render(mouseX, mouseY, delta);
             nvg.globalAlpha(1);
-
         }
-        if (getCurrentPanel() != null) {
+        if (getCurrentPanel() != null && (1 - panelAlphaAnimator.getFloat()) > 0) {
             TabPanel currentPanel = getCurrentPanel();
             nvg.globalAlpha(1 - panelAlphaAnimator.getFloat());
             currentPanel.setRectangle(new Rectangle(
