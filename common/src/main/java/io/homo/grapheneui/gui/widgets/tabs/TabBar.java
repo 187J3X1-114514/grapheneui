@@ -4,6 +4,7 @@ import io.homo.grapheneui.GrapheneUI;
 import io.homo.grapheneui.animator.Easing;
 import io.homo.grapheneui.animator.NumberAnimator;
 import io.homo.grapheneui.core.Transform;
+import io.homo.grapheneui.core.renderer.BasePanelRenderer;
 import io.homo.grapheneui.gui.widgets.containers.Container;
 import io.homo.grapheneui.impl.Rectangle;
 import io.homo.grapheneui.utils.Color;
@@ -11,19 +12,24 @@ import io.homo.grapheneui.utils.ColorUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TabBar extends Container {
-    private static float TAB_SPACING = 4;
-    private static float SLIDER_WIDTH = 3;
-    private static float SLIDER_HEIGHT_RATIO = 0.45f;
+    private static final float TAB_SPACING = 4;
+    private static final float SLIDER_WIDTH = 3;
+    private static final float SLIDER_HEIGHT_RATIO = 0.45f;
     private final NumberAnimator sliderY = NumberAnimator.create();
+    private final NumberAnimator currentPanelPosAnimator = NumberAnimator.create();
+    private final NumberAnimator lastPanelPosAnimator = NumberAnimator.create();
+    private final NumberAnimator panelAlphaAnimator = NumberAnimator.create();
+    private final List<Tab> tabsOrder = new ArrayList<>();
     public Map<Tab, TabPanel> tabMap = new HashMap<>();
     protected Tab currentTab;
-    private float targetSliderY;
+    protected Tab lastTab;
 
     public TabBar() {
-        panelRenderer.shadow(false).panelColor(
+        panelRenderer.setVariant(BasePanelRenderer.PanelVariant.FILLED).panelColor(
                 ColorUtil.mix(
                         GrapheneUI.THEME.INTERFACE_BG_C,
                         Color.rgb(0xFFFFFF),
@@ -33,50 +39,118 @@ public class TabBar extends Container {
     }
 
     public void setCurrentTab(Tab currentTab) {
-        if (this.currentTab != null && this.currentTab != currentTab) {
-            this.currentTab.getPanelRenderer().setChecked(false);
-            this.currentTab.getPanelRenderer().setHover(false);
+        if (this.currentTab == null) {
+            this.lastTab = currentTab;
+            this.currentTab = currentTab;
+            return;
         }
         if (this.currentTab != currentTab) {
-            currentTab.getPanelRenderer().setChecked(true);
-            currentTab.getPanelRenderer().setHover(false);
+            this.lastTab = this.currentTab;
             this.currentTab = currentTab;
-            sliderY.animateTo(getSliderTargetY(), 250)
-                    .ease(Easing.EASE_OUT_QUINT);
+            this.lastTab.getPanelRenderer().setChecked(false);
+            this.lastTab.getPanelRenderer().setHover(false);
+            this.currentTab.getPanelRenderer().setChecked(true);
+            this.currentTab.getPanelRenderer().setHover(false);
+            List<Tab> tabsOrder = new ArrayList<>(tabMap.keySet());
+            int currentIndex = tabsOrder.indexOf(currentTab);
+            int lastIndex = tabsOrder.indexOf(lastTab);
+            boolean isDownward = currentIndex > lastIndex;
+
+            float panelHeight = getRectangle().height - 2;
+            int duration = 400;
+
+            if (isDownward) {
+                currentPanelPosAnimator.set(panelHeight).animateTo(0, duration).ease(Easing.EASE_OUT_QUINT);
+                lastPanelPosAnimator.set(0).animateTo(-panelHeight, duration).ease(Easing.EASE_OUT_QUINT);
+            } else {
+                currentPanelPosAnimator.set(-panelHeight).animateTo(0, duration).ease(Easing.EASE_OUT_QUINT);
+                lastPanelPosAnimator.set(0).animateTo(panelHeight, duration).ease(Easing.EASE_OUT_QUINT);
+            }
+
+            panelAlphaAnimator.set(1).animateTo(0, duration).ease(Easing.EASE_OUT_QUINT);
+            sliderY.animateTo(getSliderTargetY(), 250).ease(Easing.EASE_OUT_QUINT);
         }
     }
 
     @Override
     public void render(float mouseX, float mouseY, float delta) {
         nvg.save();
+        lastPanelPosAnimator.update();
+        currentPanelPosAnimator.update();
+        panelAlphaAnimator.update();
         updateCurrentTab();
         arrangeTabs();
         super.render(mouseX, mouseY, delta);
         renderSlider(delta);
+        /////////
+        nvg.transform(Transform.fromPosition(
+                rectangle.x + 47,
+                rectangle.y + 2
+        ));
         if (getCurrentPanel() != null) {
             TabPanel tabPanel = getCurrentPanel();
-            tabPanel.setRectangle(new Rectangle(
+            tabPanel.getPanelRenderer().renderPanel(
+                    tabPanel.getRectangle().width,
+                    tabPanel.getRectangle().height,
+                    delta
+            );
+        } else if (getLastPanel() != null) {
+            TabPanel tabPanel = getLastPanel();
+            tabPanel.getPanelRenderer().renderPanel(
+                    tabPanel.getRectangle().width,
+                    tabPanel.getRectangle().height,
+                    delta
+            );
+        }
+        nvg.resetTransform();
+        /////////
+        nvg.scissor(
+                rectangle.x + 47,
+                rectangle.y + 2,
+                rectangle.width - 47,
+                rectangle.height - 2
+        );
+        if (getLastPanel() != null) {
+            TabPanel lastPanel = getLastPanel();
+            nvg.globalAlpha(panelAlphaAnimator.getFloat());
+            lastPanel.setRectangle(new Rectangle(
                     rectangle.x + 47,
-                    rectangle.y + 2,
+                    rectangle.y + 2 + (int) lastPanelPosAnimator.getFloat(),
                     rectangle.width - 47,
                     rectangle.height - 2
             ));
-            tabPanel.render(mouseX, mouseY, delta);
+            lastPanel.render(mouseX, mouseY, delta);
+            nvg.globalAlpha(1);
+
         }
+        if (getCurrentPanel() != null) {
+            TabPanel currentPanel = getCurrentPanel();
+            nvg.globalAlpha(1 - panelAlphaAnimator.getFloat());
+            currentPanel.setRectangle(new Rectangle(
+                    rectangle.x + 47,
+                    rectangle.y + 2 + (int) currentPanelPosAnimator.getFloat(),
+                    rectangle.width - 47,
+                    rectangle.height - 2
+            ));
+            currentPanel.render(mouseX, mouseY, delta);
+            nvg.globalAlpha(1);
+
+        }
+        nvg.resetScissor();
+
         nvg.restore();
     }
 
     private void updateCurrentTab() {
         if (currentTab == null && !tabMap.isEmpty()) {
-
-            setCurrentTab(tabMap.keySet().iterator().next());
+            setCurrentTab(tabsOrder.get(0));
         }
     }
 
     private void arrangeTabs() {
-        ArrayList<Tab> leftTabs = new ArrayList<>();
-        ArrayList<Tab> centerTabs = new ArrayList<>();
-        ArrayList<Tab> rightTabs = new ArrayList<>();
+        List<Tab> leftTabs = new ArrayList<>();
+        List<Tab> centerTabs = new ArrayList<>();
+        List<Tab> rightTabs = new ArrayList<>();
 
         for (Tab tab : tabMap.keySet()) {
             tab.setBar(this);
@@ -91,17 +165,12 @@ public class TabBar extends Container {
         layoutVerticalColumn(rightTabs, rectangle.height - rightTabs.size() * 42);
     }
 
-    private void layoutVerticalColumn(ArrayList<Tab> tabs, float yPos) {
+    private void layoutVerticalColumn(List<Tab> tabs, float yPos) {
         if (tabs.isEmpty()) return;
         float currentY = yPos;
 
         for (Tab tab : tabs) {
-            tab.setRectangle(new Rectangle(
-                    3,
-                    (int) currentY,
-                    42,
-                    42
-            ));
+            tab.setRectangle(new Rectangle(3, (int) currentY, 42, 42));
             currentY += 42 + TAB_SPACING;
         }
     }
@@ -111,13 +180,12 @@ public class TabBar extends Container {
         sliderY.update();
         Rectangle tabRect = currentTab.getRectangle();
         float sliderHeight = 42 * SLIDER_HEIGHT_RATIO;
-        float sliderYPos = (float) (sliderY.getValue() + (tabRect.height - sliderHeight) / 2);
         nvg.save();
         nvg.transform(Transform.fromPosition(rectangle.x, rectangle.y));
         nvg.drawRoundedRect(
                 3,
-                sliderYPos,
-                4,
+                sliderY.getFloat() + (tabRect.height - sliderHeight) / 2,
+                SLIDER_WIDTH,
                 sliderHeight,
                 1.5f,
                 GrapheneUI.THEME.THEME,
@@ -127,12 +195,11 @@ public class TabBar extends Container {
     }
 
     public TabPanel getCurrentPanel() {
-        if (currentTab != null) {
-            if (tabMap.get(currentTab) != null) {
-                return tabMap.get(currentTab);
-            }
-        }
-        return null;
+        return currentTab != null ? tabMap.get(currentTab) : null;
+    }
+
+    public TabPanel getLastPanel() {
+        return lastTab != null ? tabMap.get(lastTab) : null;
     }
 
     private float getSliderTargetY() {
@@ -141,9 +208,11 @@ public class TabBar extends Container {
 
     public TabBar addTab(Tab tab, TabPanel panel) {
         tabMap.put(tab, panel);
+        tabsOrder.add(tab);
         addChild(tab);
         return this;
     }
+
 
     @Override
     public void mouseMove(float x, float y) {

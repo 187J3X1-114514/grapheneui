@@ -19,7 +19,7 @@ public class IconRenderer extends NanoVGRendererBase {
                 -textSize.y / 2,
                 1000000,
                 GrapheneUI.CONST.ICON_SIZE,
-                nvg.fillColor().nvg()
+                nvg.fillColor()
         );
         nvg.restore();
     }

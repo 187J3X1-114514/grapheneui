@@ -16,6 +16,8 @@ import net.minecraft.network.chat.Component;
 
 public class DemoScreen extends NanoVGScreen<DemoScreen> {
     protected TabPanel container;
+    protected TabPanel container2;
+
     protected Tab tab;
     protected TabBar tabBar;
 
@@ -34,6 +36,14 @@ public class DemoScreen extends NanoVGScreen<DemoScreen> {
                 400,
                 300
         ));
+        container2 = new TabPanel();
+        container2.setRectangle(new Rectangle(
+                10,
+                10,
+                400,
+                300
+        ));
+
         container.addChild(
                 ButtonBuilder.flatButton()
                         .withRectangle(new Rectangle(90, 10, 70, 40))
@@ -101,6 +111,24 @@ public class DemoScreen extends NanoVGScreen<DemoScreen> {
                         .withZoom(true)
                         .build()
         );
+        container2.addChild(
+                new SwitchBuilder()
+                        .withRectangle(new Rectangle(60, 100, 40, 20))
+                        .withTooltip("开关")
+                        .withTooltipPosition(TooltipRenderer.RIGHT)
+                        .withChecked(true)
+                        .withZoom(false)
+                        .build()
+        );
+        container2.addChild(
+                new SwitchBuilder()
+                        .withRectangle(new Rectangle(110, 100, 40, 20))
+                        .withTooltip("开关")
+                        .withTooltipPosition(TooltipRenderer.RIGHT)
+                        .withChecked(false)
+                        .withZoom(true)
+                        .build()
+        );
         this.tab = new Tab().setTabIcon((Icon) FluentIconPack.regular().values().toArray()[0]);
 
         tabBar = new TabBar();
@@ -117,7 +145,7 @@ public class DemoScreen extends NanoVGScreen<DemoScreen> {
                 new Tab()
                         .setTabText("fhfghfghfgh")
                         .setTabIcon((Icon) FluentIconPack.regular().values().toArray()[20]),
-                container
+                container2
         );
         tabBar.addTab(
                 new Tab()
@@ -129,7 +157,7 @@ public class DemoScreen extends NanoVGScreen<DemoScreen> {
                 new Tab()
                         .setTabText("345634534534")
                         .setTabIcon((Icon) FluentIconPack.regular().values().toArray()[1]),
-                container
+                container2
         );
         tabBar.addTab(
                 new Tab()
@@ -157,7 +185,6 @@ public class DemoScreen extends NanoVGScreen<DemoScreen> {
 
     @Override
     public void draw(int mouseX, int mouseY, float delta) {
-        tab.setTabText("fhfghfghfgh");
         super.draw(mouseX, mouseY, delta);
     }
 

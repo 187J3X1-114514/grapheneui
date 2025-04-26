@@ -77,7 +77,7 @@ public class PressButton<T> extends AbstractButton<T> {
                     rectangle.y + rectangle.height * 0.5f,
                     10000,
                     1,
-                    Color.rgb(255, 255, 255).nvg(),
+                    Color.rgb(255, 255, 255),
                     TextAlign.of(
                             TextAlign.ALIGN_CENTER,
                             TextAlign.ALIGN_MIDDLE

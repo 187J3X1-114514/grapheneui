@@ -8,7 +8,6 @@ public class BasePanelRenderer extends HighlightRenderer {
     protected Color shadowColor;
     protected PanelVariant variant;
     protected boolean clickable;
-    protected boolean shadow;
     protected float radius = 5;
 
 
@@ -34,25 +33,19 @@ public class BasePanelRenderer extends HighlightRenderer {
         return this;
     }
 
-    public BasePanelRenderer variant(PanelVariant variant) {
+    public BasePanelRenderer setVariant(PanelVariant variant) {
         this.variant = variant;
         return this;
     }
 
-    public BasePanelRenderer clickable(boolean clickable) {
+    public BasePanelRenderer setClickable(boolean clickable) {
         this.clickable = clickable;
-        return this;
-    }
-
-    public BasePanelRenderer shadow(boolean shadow) {
-        this.shadow = shadow;
         return this;
     }
 
     public void renderPanel(float width, float height, float delta) {
         nvg.save();
-        nvg.globalAlpha(1.0f);
-        if (shadow) {
+        if (variant == PanelVariant.SHADOW) {
             nvg.drawRoundedRect(
                     0,
                     0,
@@ -79,7 +72,7 @@ public class BasePanelRenderer extends HighlightRenderer {
                     height,
                     radius,
                     panelColor,
-                    true
+                    variant == PanelVariant.FILLED
             );
         }
         if (clickable) this.renderHighlight(
@@ -93,6 +86,6 @@ public class BasePanelRenderer extends HighlightRenderer {
     }
 
     public enum PanelVariant {
-        FILLED, OUTLINED
+        SHADOW, OUTLINED, FILLED
     }
 }

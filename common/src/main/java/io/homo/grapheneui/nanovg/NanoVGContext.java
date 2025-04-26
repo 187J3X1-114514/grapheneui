@@ -28,6 +28,8 @@ public class NanoVGContext {
     private Color S_fillColor = Color.black();
     private Color S_strokeColor = Color.black();
     private float S_strokeWidth = 1f;
+    private float S_alpha = 1f;
+
     ///
 
     public NanoVGContext(int nvgFlags) {
@@ -209,8 +211,12 @@ public class NanoVGContext {
         nvgFillPaint(contextPtr, imgPaint);
     }
 
+    public float globalAlpha() {
+        return S_alpha;
+    }
+
     public void globalAlpha(float alpha) {
-        NanoVG.nvgGlobalAlpha(contextPtr, alpha);
+        S_alpha = alpha;
     }
 
     public void resetScissor() {
@@ -299,6 +305,9 @@ public class NanoVGContext {
             Color to,
             NVGPaint srcPaint
     ) {
+        from = from.copy().alpha((int) (globalAlpha() * from.alpha()));
+        to = to.copy().alpha((int) (globalAlpha() * to.alpha()));
+
         NVGPaint paint = NanoVG.nvgLinearGradient(
                 contextPtr,
                 startX,
@@ -319,11 +328,13 @@ public class NanoVGContext {
     }
 
     public void strokeColor(Color color) {
+        color = color.copy().alpha((int) (globalAlpha() * color.alpha()));
         S_strokeColor = Color.rgba(color.integer());
         NanoVG.nvgStrokeColor(contextPtr, color.nvg());
     }
 
     public void fillColor(Color color) {
+        color = color.copy().alpha((int) (globalAlpha() * color.alpha()));
         S_fillColor = Color.rgba(color.integer());
         NanoVG.nvgFillColor(contextPtr, color.nvg());
     }

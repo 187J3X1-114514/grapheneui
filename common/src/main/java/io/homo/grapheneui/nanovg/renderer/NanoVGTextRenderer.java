@@ -4,7 +4,7 @@ import io.homo.grapheneui.impl.Vec2;
 import io.homo.grapheneui.nanovg.NanoVGContext;
 import io.homo.grapheneui.nanovg.NanoVGFont;
 import io.homo.grapheneui.nanovg.NanoVGRendererBase;
-import org.lwjgl.nanovg.NVGColor;
+import io.homo.grapheneui.utils.Color;
 import org.lwjgl.nanovg.NanoVG;
 
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public class NanoVGTextRenderer extends NanoVGRendererBase {
 
     public TextMetrics drawText(NanoVGFont font, float fontSize, String text,
                                 float startX, float startY, float maxWidth,
-                                float lineHeight, NVGColor color) {
+                                float lineHeight, Color color) {
         return drawAlignedText(
                 font.name,
                 fontSize,
@@ -92,7 +92,7 @@ public class NanoVGTextRenderer extends NanoVGRendererBase {
 
     public TextMetrics drawWrappedText(NanoVGFont font, float fontSize, String text,
                                        float startX, float startY, float maxWidth,
-                                       float lineHeight, NVGColor color) {
+                                       float lineHeight, Color color) {
         return drawAlignedText(
                 font.name,
                 fontSize,
@@ -109,7 +109,7 @@ public class NanoVGTextRenderer extends NanoVGRendererBase {
 
     public TextMetrics drawWrappedAlignedText(NanoVGFont font, float fontSize, String text,
                                               float startX, float startY, float maxWidth,
-                                              float lineHeight, NVGColor color, TextAlign align) {
+                                              float lineHeight, Color color, TextAlign align) {
         return drawAlignedText(
                 font.name,
                 fontSize,
@@ -132,7 +132,7 @@ public class NanoVGTextRenderer extends NanoVGRendererBase {
             float startY,
             float maxWidth,
             float lineHeight,
-            NVGColor color,
+            Color color,
             TextAlign align,
             boolean wrap) {
         return drawAlignedText(
@@ -157,16 +157,16 @@ public class NanoVGTextRenderer extends NanoVGRendererBase {
             float startY,
             float maxWidth,
             float lineHeight,
-            NVGColor color,
+            Color color,
             TextAlign align,
             boolean wrap) {
+        color = color.copy().alpha((int) (nvg.globalAlpha() * color.alpha()));
         nvgSave(contextPtr);
-
         TextMetrics metrics = calculateTextMetrics(fontName, fontSize, text, maxWidth, lineHeight, wrap);
         nvgTextAlign(contextPtr, align.horizontal() | align.vertical());
         nvgFontSize(contextPtr, fontSize);
         nvgFontFace(contextPtr, fontName);
-        nvgFillColor(contextPtr, color);
+        nvgFillColor(contextPtr, color.nvg());
         float yPos = startY;
         for (String line : metrics.lines) {
             nvgText(contextPtr, (float) Math.ceil(startX), (float) Math.ceil(yPos), line);

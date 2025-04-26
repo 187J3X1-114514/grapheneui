@@ -1,5 +1,6 @@
 package io.homo.grapheneui.gui.widgets.buttons;
 
+import io.homo.grapheneui.core.renderer.BasePanelRenderer;
 import io.homo.grapheneui.impl.Rectangle;
 import io.homo.grapheneui.utils.Color;
 
@@ -17,7 +18,7 @@ public class FlatButton<T> extends PressButton<T> {
 
     @Override
     protected void renderBackground(float mouseX, float mouseY, float delta) {
-        panelRenderer.shadow(false);
+        panelRenderer.setVariant(BasePanelRenderer.PanelVariant.FILLED);
         panelRenderer.setHoverAlpha(30);
         panelRenderer.panelColor(Color.rgba(255, 255, 255, 0));
         panelRenderer.shadowColor(Color.rgba(255, 255, 255, 0));

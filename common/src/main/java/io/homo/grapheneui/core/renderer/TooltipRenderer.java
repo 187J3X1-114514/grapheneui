@@ -11,6 +11,7 @@ import io.homo.grapheneui.nanovg.NanoVG;
 import io.homo.grapheneui.nanovg.NanoVGFont;
 import io.homo.grapheneui.nanovg.renderer.NanoVGTextRenderer;
 import io.homo.grapheneui.nanovg.renderer.TextAlign;
+import io.homo.grapheneui.utils.Color;
 
 import java.util.Optional;
 
@@ -183,7 +184,6 @@ public class TooltipRenderer extends HighlightRenderer {
             //baseX = posAnimator.x();
             //baseY = posAnimator.y();
             nvg.save();
-            nvg.globalAlpha(Math.min(currentAlpha * 1.2f, 1.0f));
             nvg.transform(
                     Transform.identity()
                             .position(baseX, baseY)
@@ -194,7 +194,8 @@ public class TooltipRenderer extends HighlightRenderer {
                     Math.max(width * currentWidth, 20),
                     height,
                     radius,
-                    GrapheneUI.THEME.TOOLTIP_BG,
+                    Color.from(GrapheneUI.THEME.TOOLTIP_BG.nvg())
+                            .alpha((int) (Math.min(currentAlpha * 1.2f, 1.0f) * 255)),
                     true
             );
             this.renderHighlight(
@@ -206,7 +207,6 @@ public class TooltipRenderer extends HighlightRenderer {
             );
             nvg.restore();
             nvg.save();
-            nvg.globalAlpha(currentAlpha);
             nvg.scissor(
                     baseX,
                     baseY,
@@ -222,7 +222,7 @@ public class TooltipRenderer extends HighlightRenderer {
                     baseY + height / 2 - textHeight / 2 + 1,
                     textWidth,
                     fontSize + 2,
-                    GrapheneUI.THEME.TEXT_A.nvg(),
+                    Color.from(GrapheneUI.THEME.TEXT_A).alpha((int) (currentAlpha * 255)),
                     TextAlign.of(
                             TextAlign.ALIGN_LEFT,
                             TextAlign.ALIGN_TOP

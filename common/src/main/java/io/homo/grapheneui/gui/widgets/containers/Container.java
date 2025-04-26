@@ -18,10 +18,20 @@ public class Container extends AbstractWidget<Container> {
     protected BasePanelRenderer panelRenderer = new BasePanelRenderer(
             GrapheneUI.THEME.INTERFACE_BG_C,
             GrapheneUI.THEME.INTERFACE_BG_A,
-            BasePanelRenderer.PanelVariant.FILLED
-    ).shadow(true);
+            BasePanelRenderer.PanelVariant.SHADOW
+    );
     protected List<ContainerChildren> children = new ArrayList<>();
     private Vec2 padding = new Vec2(2, 2);
+    private boolean renderPanel = true;
+
+    public boolean isRenderPanel() {
+        return renderPanel;
+    }
+
+    public Container setRenderPanel(boolean renderPanel) {
+        this.renderPanel = renderPanel;
+        return this;
+    }
 
     public Vec2 getPadding() {
         return padding;
@@ -60,20 +70,25 @@ public class Container extends AbstractWidget<Container> {
         this.rectangle = rectangle;
     }
 
+    public BasePanelRenderer getPanelRenderer() {
+        return panelRenderer;
+    }
+
     @Override
     public void render(float mouseX, float mouseY, float delta) {
         nvg.save();
-        panelRenderer.clickable(false);
+        panelRenderer.setClickable(false);
         if (!isVisible()) return;
         nvg.transform(Transform.fromPosition(
                 getRectangle().x,
                 getRectangle().y
         ));
-        panelRenderer.renderPanel(
-                getRectangle().width,
-                getRectangle().height,
-                delta
-        );
+        if (isRenderPanel())
+            panelRenderer.renderPanel(
+                    getRectangle().width,
+                    getRectangle().height,
+                    delta
+            );
         nvg.resetTransform();
         nvg.resetGlobalTransform();
         Map<Integer, List<ContainerChildren>> layers = children.stream()

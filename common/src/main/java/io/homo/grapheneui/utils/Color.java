@@ -15,6 +15,14 @@ public class Color {
     }
 
     public static Color from(Object object) {
+        if (object instanceof Color) {
+            return Color.rgba(
+                    ((Color) object).red(),
+                    ((Color) object).green(),
+                    ((Color) object).blue(),
+                    ((Color) object).alpha()
+            );
+        }
         if (object instanceof NVGColor) {
             return Color.rgba(
                     ((NVGColor) object).r(),
@@ -118,6 +126,29 @@ public class Color {
         return color[3];
     }
 
+    public Color red(int v) {
+        color[0] = v;
+        return this;
+    }
+
+    public Color green(int v) {
+        color[1] = v;
+        return this;
+
+    }
+
+    public Color blue(int v) {
+        color[2] = v;
+        return this;
+
+    }
+
+    public Color alpha(int v) {
+        color[3] = v;
+        return this;
+
+    }
+
     public NVGColor nvg() {
         return Color.toNVG(this);
     }
@@ -129,4 +160,14 @@ public class Color {
     public int integer() {
         return Color.toInt(this);
     }
+
+    public Color copy() {
+        return rgba(
+                color[0],
+                color[1],
+                color[2],
+                color[3]
+        );
+    }
+
 }
